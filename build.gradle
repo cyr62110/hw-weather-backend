@@ -1,0 +1,13 @@
+allprojects {
+    ext {
+        kotlinVersion='0.1-SNAPSHOT'
+        springBootVersion = '1.2.5.RELEASE'
+    }
+
+    repositories {
+        jcenter()
+        maven {
+            url 'https://dl.bintray.com/cyr62110/maven'
+        }
+    }
+}
