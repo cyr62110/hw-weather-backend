@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.core.annotations;
+package fr.cvlaminck.hwweather.core.external.annotations;
 
 import org.springframework.stereotype.Component;
 

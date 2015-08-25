@@ -18,9 +18,10 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-jetty:$springBootVersion"
     compile "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
 
+    compile 'org.springframework.data:spring-data-mongodb:1.7.2.RELEASE'
+
     compile 'io.reactivex:rxjava:1.0.14'
 
-    compile 'fr.cvlaminck:java-nominatim:0.3'
-
     compile project(':backend-internal-api')
+    compile project(':city-provider-nominatim')
 }
