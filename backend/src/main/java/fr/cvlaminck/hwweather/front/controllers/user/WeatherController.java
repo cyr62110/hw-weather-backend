@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.front.controllers;
+package fr.cvlaminck.hwweather.front.controllers.user;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

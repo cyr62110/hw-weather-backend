@@ -1,5 +1,7 @@
-package fr.cvlaminck.hwweather.front.controllers;
+package fr.cvlaminck.hwweather.front.controllers.user;
 
+import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
+import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.data.model.CityEntity;
 import fr.cvlaminck.hwweather.front.model.CityResource;
@@ -14,7 +16,7 @@ import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.managers.CityDataProviderManager;
 
 @RestController
-@RequestMapping("/city")
+@RequestMapping("/cities")
 public class CityController {
 
     @Autowired
@@ -29,8 +31,8 @@ public class CityController {
     }
 
     @RequestMapping("/{id}")
-    public CityEntity get(@PathVariable String id) { //FIXME
-        return cityManager.getById(id);
+    public CityEntity get(@PathVariable String id) throws Exception { //FIXME
+        return cityManager.getCity(id, "en-US");
     }
 
 }

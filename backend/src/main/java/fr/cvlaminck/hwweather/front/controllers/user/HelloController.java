@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.front.controllers;
+package fr.cvlaminck.hwweather.front.controllers.user;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

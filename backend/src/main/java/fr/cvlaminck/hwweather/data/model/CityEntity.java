@@ -2,16 +2,22 @@ package fr.cvlaminck.hwweather.data.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;
+import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
+@Document(collection = "cities")
 public class CityEntity {
     @Id
     private String id;
     @Indexed
-    private Set<CityExternalIdEntity> externalIds = new HashSet<>();
-    @Indexed
+    private Collection<CityExternalIdEntity> externalIds = new HashSet<>();
+    @GeoSpatialIndexed
     private Point location;
     private Map<String, InternationalizedInformation> i18nInformation = new HashMap<>(); //ISO 639-2 Language code -> name
 
@@ -22,6 +28,7 @@ public class CityEntity {
         }
         return info;
     }
+
     public void addInternationalizedInformation(String languageCode, InternationalizedInformation info) {
         i18nInformation.put(languageCode, info);
     }
@@ -33,12 +40,15 @@ public class CityEntity {
     public double getLongitude() {
         return location.getX();
     }
+
     public double getLatitude() {
         return location.getY();
     }
+
     public void setLocation(double longitude, double latitude) {
         this.location = new Point(longitude, latitude);
     }
+
     public Point getLocation() {
         return location;
     }
@@ -54,12 +64,15 @@ public class CityEntity {
         public String getName() {
             return name;
         }
+
         public void setName(String name) {
             this.name = name;
         }
+
         public String getCountry() {
             return country;
         }
+
         public void setCountry(String country) {
             this.country = country;
         }

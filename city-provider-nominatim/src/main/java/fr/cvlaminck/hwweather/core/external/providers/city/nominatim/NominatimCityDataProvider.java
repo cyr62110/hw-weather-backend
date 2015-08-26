@@ -52,7 +52,7 @@ public class NominatimCityDataProvider
         List<Place> results = null;
         try {
             results = Nominatim.lookUp()
-                .id(OsmType.NODE, Long.getLong(id))
+                .id(OsmType.RELATION, Long.parseLong(id))
                 .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
                 .get();
         } catch (IOException e) {
@@ -79,13 +79,14 @@ public class NominatimCityDataProvider
     }
 
     private String getName(Place p) {
-        switch (p.getType()) {
-            case CITY:
-                return p.getAddress().getCity();
-            case TOWN:
-                return p.getAddress().getTown();
-            case HAMLET:
-                return p.getAddress().getHamlet();
+        if (p.getAddress().getCity() != null) {
+            return p.getAddress().getCity();
+        }
+        if (p.getAddress().getTown() != null) {
+            return p.getAddress().getTown();
+        }
+        if (p.getAddress().getHamlet() != null) {
+            return p.getAddress().getHamlet();
         }
         throw new IllegalStateException("Cannot find name for city with external id " + p.getOsmId());
     }

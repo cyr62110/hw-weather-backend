@@ -21,11 +21,16 @@ public class CityManager {
     public CityEntity getCity(String id, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
         CityEntity city = null;
         if (CityExternalIdEntity.isExternalId(id)) {
-            city = getOrImportCityWithExternalId(CityExternalIdEntity.parse(id));
+            city = getOrImportCityWithExternalId(CityExternalIdEntity.parse(id), languageCode);
         } else {
             city = cityRepository.findOne(id);
         }
         return refreshCityIfMissingI18NName(city, languageCode);
+    }
+
+    public CityEntity updateOrAddCityWithExternalId(String externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
+        CityExternalIdEntity externalIdEntity = CityExternalIdEntity.parse(externalId);
+        return importCityWithExternalId(externalIdEntity, languageCode);
     }
 
     private CityEntity getOrImportCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
@@ -37,17 +42,18 @@ public class CityManager {
     }
 
     private CityEntity importCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
-        ExternalCityResource externalCity = cityDataProviderManager.findById(externalId.getDataProvider(), externalId.getId());
+        ExternalCityResource externalCity = cityDataProviderManager.findById(externalId.getDataProvider(), externalId.getExternalId());
         if (externalCity == null) {
             return null;
         }
         CityEntity city = convertFromExternalResource(externalCity, languageCode);
-        return cityRepository.findByExternalIdAndModifyOrCreate(externalId, city);
+        return cityRepository.findByExternalIdAndUpdateOrElseCreate(externalId, city);
     }
 
     private CityEntity convertFromExternalResource(ExternalCityResource externalCity, String languageCode) {
         CityEntity city = new CityEntity();
-        city.setLocation(city.getLongitude(), city.getLatitude());
+        city.addExternalId(new CityExternalIdEntity(externalCity.getProvider(), externalCity.getExternalId()));
+        city.setLocation(externalCity.getLongitude(), externalCity.getLatitude());
 
         CityEntity.InternationalizedInformation info = new CityEntity.InternationalizedInformation();
         info.setName(externalCity.getName());

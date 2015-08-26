@@ -2,14 +2,29 @@ package fr.cvlaminck.hwweather.data.model;
 
 public class CityExternalIdEntity {
     private String dataProvider;
-    private String id;
+    private String externalId;
+
+    public CityExternalIdEntity() {
+    }
+
+    public CityExternalIdEntity(String dataProvider, String externalId) {
+        this.dataProvider = dataProvider;
+        this.externalId = externalId;
+    }
 
     public static boolean isExternalId(String id) {
         return id.startsWith("[");
     }
 
     public static CityExternalIdEntity parse(String id) {
-        return null; //FIXME
+        int separatorIndex = id.indexOf(":");
+        if (separatorIndex == -1) {
+            throw new IllegalStateException(""); //FIXME
+        }
+        CityExternalIdEntity externalId = new CityExternalIdEntity();
+        externalId.dataProvider = id.substring(1, separatorIndex);
+        externalId.externalId = id.substring(separatorIndex + 1, id.length() - 1);
+        return externalId;
     }
 
     public String getDataProvider() {
@@ -18,11 +33,11 @@ public class CityExternalIdEntity {
     public void setDataProvider(String dataProvider) {
         this.dataProvider = dataProvider;
     }
-    public String getId() {
-        return id;
+    public String getExternalId() {
+        return externalId;
     }
-    public void setId(String id) {
-        this.id = id;
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 
     @Override
@@ -33,7 +48,7 @@ public class CityExternalIdEntity {
         CityExternalIdEntity that = (CityExternalIdEntity) o;
 
         if (!dataProvider.equals(that.dataProvider)) return false;
-        if (!id.equals(that.id)) return false;
+        if (!externalId.equals(that.externalId)) return false;
 
         return true;
     }
@@ -41,12 +56,12 @@ public class CityExternalIdEntity {
     @Override
     public int hashCode() {
         int result = dataProvider.hashCode();
-        result = 31 * result + id.hashCode();
+        result = 31 * result + externalId.hashCode();
         return result;
     }
 
     @Override
     public String toString() {
-        return String.format("[%s:%s]", dataProvider, id);
+        return String.format("[%s:%s]", dataProvider, externalId);
     }
 }
