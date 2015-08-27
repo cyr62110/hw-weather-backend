@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.Map;
+
 public class CityRepositoryImpl
     implements CityRepositoryCustom {
 
@@ -17,15 +19,20 @@ public class CityRepositoryImpl
 
     public CityEntity findByExternalIdAndUpdateOrElseCreate(CityExternalIdEntity id, CityEntity city) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("externalIds").is(id));
+        Criteria elemMatchCriteria = Criteria
+                .where("externalId").is(id.getExternalId())
+                .and("dataProvider").is(id.getDataProvider());
+        query.addCriteria(Criteria.where("externalIds").elemMatch(elemMatchCriteria));
 
         Update update = new Update();
-        update.addToSet("externalIds") //FIXME Field named 'externalIds' has a non-array type Object in the document INVALID-MUTABLE-ELEMENT
-                .value(id);
+        update.addToSet("externalIds").value(id);
         update.set("location", city.getLocation());
+        for (Map.Entry<String, CityEntity.InternationalizedInformation> entry : city.getInternationalizedInformation().entrySet()) {
+            update.set("i18nInformation." + entry.getKey(), entry.getValue());
+        }
 
         WriteResult writeResult = mongoOperations.upsert(query, update, CityEntity.class);
-        return mongoOperations.findById(writeResult.getUpsertedId(), CityEntity.class);
+        return mongoOperations.findOne(query, CityEntity.class);
     }
 
 }

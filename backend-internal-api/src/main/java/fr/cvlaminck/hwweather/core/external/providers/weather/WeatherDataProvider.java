@@ -27,8 +27,9 @@ public interface WeatherDataProvider
 
     /**
      * Query the data provider for this geo location.
-     * The weather data should contains all types described in getTypes().
+     * The weather data should contains all types described in typesToRefresh.
+     * It may also contain more type
      */
-    ExternalWeatherData refresh(double latitude, double longitude);
+    ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh);
 
 }

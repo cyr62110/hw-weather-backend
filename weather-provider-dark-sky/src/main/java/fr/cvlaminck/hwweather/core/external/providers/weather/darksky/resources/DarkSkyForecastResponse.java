@@ -1,6 +1,6 @@
 package fr.cvlaminck.hwweather.core.external.providers.weather.darksky.resources;
 
-public class DarkSkyResponse {
+public class DarkSkyForecastResponse {
 
     private double latitude;
     private double longitude;

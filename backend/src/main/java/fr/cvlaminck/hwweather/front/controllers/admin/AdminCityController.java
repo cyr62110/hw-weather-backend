@@ -14,8 +14,13 @@ public class AdminCityController {
     @Autowired
     private CityManager cityManager;
 
+    @RequestMapping("/{id}")
+    public CityEntity get(@PathVariable String id) throws Exception {
+        return cityManager.getCity(id, "en-US");
+    }
+
     @RequestMapping("/{id}/update")
-    public CityEntity update(@PathVariable String id) throws Exception {
+    public CityEntity forceUpdate(@PathVariable String id) throws Exception {
         return cityManager.updateOrAddCityWithExternalId(id, "en-US");
     }
 

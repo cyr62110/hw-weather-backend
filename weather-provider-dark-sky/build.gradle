@@ -4,5 +4,7 @@ sourceCompatibility = 1.8
 version = '1.0'
 
 dependencies {
+    compile 'com.squareup.retrofit:retrofit:1.9.0'
+
     compile project(':backend-internal-api')
 }

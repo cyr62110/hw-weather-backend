@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.repository.Query;
 public interface CityRepository
         extends MongoRepository<CityEntity, String>, CityRepositoryCustom {
 
-    @Query("{ externalIds : { $in : ?0 } }")
+    @Query("{ externalIds : { $elemMatch : ?0 } }")
     public CityEntity findByExternalId(CityExternalIdEntity externalId);
 
 }

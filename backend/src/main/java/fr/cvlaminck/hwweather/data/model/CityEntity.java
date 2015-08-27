@@ -6,10 +6,7 @@ import org.springframework.data.mongodb.core.index.GeoSpatialIndexed;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 @Document(collection = "cities")
 public class CityEntity {
@@ -20,6 +17,10 @@ public class CityEntity {
     @GeoSpatialIndexed
     private Point location;
     private Map<String, InternationalizedInformation> i18nInformation = new HashMap<>(); //ISO 639-2 Language code -> name
+
+    public Map<String, InternationalizedInformation> getInternationalizedInformation() {
+        return Collections.unmodifiableMap(i18nInformation);
+    }
 
     public InternationalizedInformation getInternationalizedInformation(String languageCode) {
         InternationalizedInformation info = i18nInformation.get(languageCode);
