@@ -19,6 +19,10 @@ public class ExternalWeatherData {
         return false;
     }
 
+    public void merge(ExternalWeatherData data) {
+        //TODO
+    }
+
     public ExternalCurrentWeatherResource getCurrent() {
         return current;
     }

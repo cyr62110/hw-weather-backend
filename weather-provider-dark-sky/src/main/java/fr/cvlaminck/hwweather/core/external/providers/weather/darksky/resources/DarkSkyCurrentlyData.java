@@ -7,22 +7,18 @@ public class DarkSkyCurrentlyData
     private int nearestStormDistance;
     private int nearestStormBearing;
 
-    @Override
     public double getTemperature() {
         return temperature;
     }
 
-    @Override
     public void setTemperature(double temperature) {
         this.temperature = temperature;
     }
 
-    @Override
     public double getApparentTemperature() {
         return apparentTemperature;
     }
 
-    @Override
     public void setApparentTemperature(double apparentTemperature) {
         this.apparentTemperature = apparentTemperature;
     }

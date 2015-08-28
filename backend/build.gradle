@@ -24,4 +24,5 @@ dependencies {
 
     compile project(':backend-internal-api')
     compile project(':city-provider-nominatim')
+    compile project(':weather-provider-dark-sky')
 }

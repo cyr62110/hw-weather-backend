@@ -2,10 +2,34 @@ package fr.cvlaminck.hwweather.core.external.providers.weather.darksky.resources
 
 import java.util.Collection;
 
-public class DarkSkyDaily {
+public class DarkSkyDailyData {
     private String summary;
     private String icon;
     private Collection<Data> data;
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public Collection<Data> getData() {
+        return data;
+    }
+
+    public void setData(Collection<Data> data) {
+        this.data = data;
+    }
 
     public static class Data
         extends DarkSkyData {

@@ -12,10 +12,12 @@ import java.util.Map;
 @Component
 public class WeatherManager {
 
-
+    @Autowired
+    WeatherDataProviderManager weatherDataProviderManager;
 
     public void forceUpdate(CityEntity city) {
-
+        //FIXME
+        weatherDataProviderManager.refresh(city.getLatitude(), city.getLongitude());
     }
 
 }

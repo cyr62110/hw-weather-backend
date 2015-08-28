@@ -2,7 +2,8 @@ package fr.cvlaminck.hwweather.core.external.model.weather;
 
 import java.util.Date;
 
-public class ExternalHourlyForecastResource {
+public class ExternalHourlyForecastResource
+        extends ExternalWeatherResource {
     private Date hour;
     private ExternalWeatherCondition weatherCondition;
     private double temperature; //In celsius

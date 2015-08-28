@@ -19,7 +19,7 @@ public class WeatherDataProviderManager {
     }
 
     public ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh) {
-        ExternalWeatherData data = null;
+        ExternalWeatherData data = new ExternalWeatherData();
 
         //Set of types of weather data that has not been refreshed by another provider in the list.
         Collection<ExternalWeatherDataType> typesToRefreshLeft = new HashSet<>();
@@ -28,10 +28,11 @@ public class WeatherDataProviderManager {
         //FIXME
         for (WeatherDataProvider provider: getBestProvidersForRefreshOperation()) {
             //We use the next provider in the list to get data.
+            ExternalWeatherData response = provider.refresh(latitude, longitude, typesToRefreshLeft);
             //We merge the data with the one provided by the other providers preceding this one
             //Then we update the list of missing data
         }
-        return null;
+        return data;
     }
 
     private Collection<WeatherDataProvider> getBestProvidersForRefreshOperation() {
