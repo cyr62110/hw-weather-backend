@@ -1,6 +1,5 @@
 allprojects {
     ext {
-        kotlinVersion='0.1-SNAPSHOT'
         springBootVersion = '1.2.5.RELEASE'
     }
 

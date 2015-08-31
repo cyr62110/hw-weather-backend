@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather;
 
+import fr.cvlaminck.hwweather.config.MessageBrokerConfig;
 import fr.cvlaminck.hwweather.config.MongoConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -8,7 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @EnableAutoConfiguration
-@Import(MongoConfig.class)
+@Import({MongoConfig.class, MessageBrokerConfig.class})
 @ComponentScan(basePackages = "fr.cvlaminck.hwweather")
 public class Application {
 

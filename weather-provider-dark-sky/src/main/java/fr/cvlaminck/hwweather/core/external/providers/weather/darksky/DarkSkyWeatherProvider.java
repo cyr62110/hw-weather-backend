@@ -14,8 +14,7 @@ import java.util.Collection;
 public class DarkSkyWeatherProvider
     implements WeatherDataProvider {
 
-    @Autowired
-    private DarkSkyWeatherForecastUpdater updater;
+    private DarkSkyWeatherForecastUpdater updater = new DarkSkyWeatherForecastUpdater(this);
 
     @Override
     public String getProviderName() {

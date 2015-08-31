@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.data.model;
+package fr.cvlaminck.hwweather.data.model.city;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.geo.Point;

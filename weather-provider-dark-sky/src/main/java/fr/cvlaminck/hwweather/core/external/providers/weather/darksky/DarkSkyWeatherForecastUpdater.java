@@ -9,7 +9,6 @@ import retrofit.RestAdapter;
 
 import java.util.*;
 
-@Component
 public class DarkSkyWeatherForecastUpdater {
 
     private WeatherDataProvider dataProvider;

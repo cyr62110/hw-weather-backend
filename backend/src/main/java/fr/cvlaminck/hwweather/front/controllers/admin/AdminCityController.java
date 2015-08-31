@@ -1,7 +1,7 @@
 package fr.cvlaminck.hwweather.front.controllers.admin;
 
 import fr.cvlaminck.hwweather.core.managers.CityManager;
-import fr.cvlaminck.hwweather.data.model.CityEntity;
+import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

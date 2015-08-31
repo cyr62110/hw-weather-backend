@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.data.model;
+package fr.cvlaminck.hwweather.data.model.city;
 
 public class CityExternalIdEntity {
     private String dataProvider;
