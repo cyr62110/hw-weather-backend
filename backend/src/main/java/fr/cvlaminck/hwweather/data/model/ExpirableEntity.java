@@ -18,11 +18,18 @@ public abstract class ExpirableEntity {
     private int expiryInSeconds;
 
     public boolean isInGracePeriod() {
-        return getGracePeriodStartTime().isBefore(OffsetDateTime.now(ZoneId.of("UTC")));
+        if (isExpired()) {
+            return false;
+        }
+        return isExpiredOrInGracePeriod();
     }
 
     public boolean isExpired() {
         return getExpiryDate().isBefore(OffsetDateTime.now(ZoneId.of("UTC")));
+    }
+
+    public boolean isExpiredOrInGracePeriod() {
+        return getGracePeriodStartTime().isBefore(OffsetDateTime.now(ZoneId.of("UTC")));
     }
 
     public OffsetDateTime getRefreshTime() {
