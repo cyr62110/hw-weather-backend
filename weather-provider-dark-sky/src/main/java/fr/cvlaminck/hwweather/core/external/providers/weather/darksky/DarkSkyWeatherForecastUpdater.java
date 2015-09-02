@@ -90,6 +90,6 @@ public class DarkSkyWeatherForecastUpdater {
     }
 
     private String getApiKey() {
-        return "bcaa923416404af055f7a55001f1e7b6"; //FIXME Remove before pushing to GitHub
+        return "2c0adcb3fa33fe9084bb29cfce5532e2"; //FIXME Remove before pushing to GitHub
     }
 }

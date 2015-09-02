@@ -11,32 +11,49 @@ import fr.cvlaminck.hwweather.data.model.weather.CurrentWeatherEntity;
 import fr.cvlaminck.hwweather.data.model.weather.DailyForecastEntity;
 import fr.cvlaminck.hwweather.data.model.weather.HourlyForecastEntity;
 import fr.cvlaminck.hwweather.data.repositories.CurrentWeatherRepository;
+import fr.cvlaminck.hwweather.data.repositories.DailyForecastRepository;
+import fr.cvlaminck.hwweather.data.repositories.HourlyForecastRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class WeatherRefreshManager {
 
     @Autowired
-    WeatherDataProviderManager weatherDataProviderManager;
+    private WeatherDataProviderManager weatherDataProviderManager;
 
     @Autowired
-    AmqpTemplate amqpTemplate;
+    private WeatherDataProviderSelectionManager weatherDataProviderSelectionManager;
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     @Autowired
     private Queue weatherRefreshOperationQueue;
 
     @Autowired
     private Exchange hwWeatherExchange;
+
+    @Autowired
+    private CurrentWeatherRepository currentWeatherRepository;
+
+    @Autowired
+    private DailyForecastRepository dailyForecastRepository;
+
+    @Autowired
+    private HourlyForecastRepository hourlyForecastRepository;
+
+    private Logger log = LoggerFactory.getLogger(WeatherRefreshManager.class);
 
     /**
      * Post a refresh operation message for the city with the data type of the entity if
@@ -67,7 +84,7 @@ public class WeatherRefreshManager {
      * City are not refresh immediately by the front. To avoid useless simultaneous call to external weather API,
      * a message is posted in a queue of the message broker representing a refresh operation for a given city.
      */
-    public void postUpdate(CityEntity city, Collection<WeatherDataType> dataTypesToRefresh) {
+    public void postUpdate(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
         WeatherRefreshOperationMessage message = new WeatherRefreshOperationMessage();
         message.setCityId(city.getId());
 
@@ -76,8 +93,16 @@ public class WeatherRefreshManager {
                 message);
     }
 
-    public void refresh(CityEntity city, Collection<WeatherDataType> weatherDataTypes) {
-        //FIXME
+    public void refresh(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
+        log.debug("Refreshing weather data for city '{}'. Type to refresh: {}", city, typesToRefresh);
+        typesToRefresh = filterAlreadyRefreshedType(city, typesToRefresh);
+        if (typesToRefresh.isEmpty()) {
+            log.debug("Refreshing weather data for city '{}'. No type to refresh after filtering.", city, typesToRefresh);
+            return;
+        }
+        log.debug("Refreshing weather data for city '{}'. After filtering already refreshed information: {}", city, typesToRefresh);
+        List<WeatherDataProvider> dataProvidersToUse = weatherDataProviderSelectionManager.selectDataProvidersToUseForRefreshOperation(typesToRefresh);
+
     }
 
     private Collection<WeatherDataType> filterAlreadyRefreshedType(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
@@ -87,14 +112,19 @@ public class WeatherRefreshManager {
     }
 
     private boolean shouldRefreshTypeForCity(CityEntity city, WeatherDataType typeToRefresh) {
-
+        ExpirableEntity expirableEntity = findExpirableEntityForType(city, typeToRefresh);
+        if (expirableEntity == null) {
+            return true;
+        }
+        return expirableEntity.isExpiredOrInGracePeriod();
     }
 
     private ExpirableEntity findExpirableEntityForType(CityEntity city, WeatherDataType typeToRefresh) {
         ExpirableEntity entity = null;
         switch (typeToRefresh) {
             case WEATHER:
-                //FIXME get entity in db
+                LocalDate day = LocalDate.now(ZoneId.of("UTC"));
+                entity = currentWeatherRepository.findByCityIdAndDay(city.getId(), day);
                 break;
             case HOURLY_FORECAST:
                 //FIXME get entity in db
@@ -105,7 +135,7 @@ public class WeatherRefreshManager {
             default:
                 throw new IllegalArgumentException(); //FIXME exception message
         }
-        return null;
+        return entity;
     }
 
     private Collection<ExternalWeatherDataType> getExternalWeatherDataTypesToRefresh(Collection<WeatherDataType> weatherDataTypes) {
