@@ -26,4 +26,7 @@ dependencies {
     compile project(':backend-internal-api')
     compile project(':city-provider-nominatim')
     compile project(':weather-provider-dark-sky')
+
+    testCompile 'junit:junit:4.10'
+    testCompile 'org.mockito:mockito-all:1.9.0'
 }
