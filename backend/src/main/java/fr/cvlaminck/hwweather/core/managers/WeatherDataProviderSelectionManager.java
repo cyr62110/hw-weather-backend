@@ -75,6 +75,7 @@ public class WeatherDataProviderSelectionManager {
 
         public double getCost() {
             //FIXME
+            return 0d;
         }
 
     }
