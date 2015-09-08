@@ -1,26 +1,49 @@
 package fr.cvlaminck.hwweather.core.managers;
 
+import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
+import fr.cvlaminck.hwweather.core.utils.stats.KSubsetOfNSetIterator;
 import fr.cvlaminck.hwweather.data.model.FreeCallCountersEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.repositories.FreeCallCountersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class WeatherDataProviderSelectionManager {
 
-    @Autowired
-    private Collection<WeatherDataProvider> weatherDataProviders;
+    private Collection<WeatherDataProvider> weatherDataProviders = Collections.emptyList();
+
+    private Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap = Collections.emptyMap();
 
     @Autowired
     private FreeCallCountersRepository freeCallCountersRepository;
+
+    @Autowired
+    public void setWeatherDataProviders(Collection<WeatherDataProvider> weatherDataProviders) {
+        this.weatherDataProviders = weatherDataProviders;
+        this.providersByRefreshTypeMap = buildProvidersByRefreshTypeMap(weatherDataProviders);
+    }
+
+    private Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> buildProvidersByRefreshTypeMap(Collection<WeatherDataProvider> weatherDataProviders) {
+        Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap = new HashMap<>();
+        Set<ExternalWeatherDataType> types = Arrays.asList(ExternalWeatherDataType.values()).stream().collect(Collectors.toSet());
+        for (int i = 1; i <= types.size(); i++) {
+            KSubsetOfNSetIterator<ExternalWeatherDataType> it = new KSubsetOfNSetIterator<>(types, i);
+            it.forEachRemaining((subset) -> {
+                List<WeatherDataProvider> providersProvidingSubsetOfTypes = weatherDataProviders.stream()
+                        .filter((p) -> p.getTypes().containsAll(subset))
+                        .collect(Collectors.toList());
+                providersByRefreshTypeMap.put(subset, providersProvidingSubsetOfTypes);
+            });
+        }
+        return providersByRefreshTypeMap;
+    }
 
     public List<WeatherDataProvider> selectDataProvidersToUseForRefreshOperation(Collection<WeatherDataType> typesToRefresh) {
         FreeCallCountersEntity freeCallCounters = freeCallCountersRepository.findFreeCallsLeftForToday();

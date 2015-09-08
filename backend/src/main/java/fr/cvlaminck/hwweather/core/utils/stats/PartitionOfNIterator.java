@@ -1,52 +1,79 @@
 package fr.cvlaminck.hwweather.core.utils.stats;
 
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 // http://www.geeksforgeeks.org/generate-unique-partitions-of-an-integer/
-public class PartitionOfNIterator<T>
-    implements Iterator<Set<T>> {
+public class PartitionOfNIterator
+    implements Iterator<List<Integer>> {
+
+    private int n;
+    private int[] partition = null;
+    private int numberOfPartition = 0;
+
+    public PartitionOfNIterator(int n) {
+        this.n = n;
+    }
 
     @Override
     public boolean hasNext() {
-        return false;
+        return numberOfPartition != n;
     }
 
     @Override
-    public Set<T> next() {
-        return null;
+    public List<Integer> next() {
+        if (numberOfPartition == 0) {
+            generateInitialPartition();
+        } else {
+            generateNextPartition();
+        }
+
+        return createNextPartitionSets(partition, numberOfPartition);
     }
 
-    int[] r = null;
-    int[] m = null;
-    int d;
-    int nlast = 0;
+    private void generateInitialPartition() {
+        partition = new int[n];
+        partition[0] = n;
+        numberOfPartition = 1;
+    }
 
-    boolean nexpar(int n, boolean mtc) {
-        int s, f;
-        if (!mtc) {
-            if (n == nlast) {
-                int sum = 1;
-                if (r[d - 1] <= 1) {
-                    sum = m[d - 1] + 1;
-                    d = d - 1;
-                }
-                f = r[d - 1] - 1;
-                if (m[d - 1] <= 1) {
+    private void generateNextPartition() {
+        int k = numberOfPartition - 1;
 
-                }
-                r[d - 1] = f;
-                m[d - 1] = 1 + sum / f;
-                s = sum % f;
-
-            }
-            nlast = n;
+        // Find the rightmost non-one value in p[]. Also, update the
+        // rem_val so that we know how much value can be accommodated
+        int rem_val = 0;
+        while (k >= 0 && partition[k] == 1)
+        {
+            rem_val += partition[k];
+            k--;
         }
-        s = n;
-        d = 1;
-        r[d - 1] = s;
-        m[d - 1] = 1;
-        return m[d - 1] != n;
+
+        // Decrease the p[k] found above and adjust the rem_val
+        partition[k]--;
+        rem_val++;
+
+        // If rem_val is more, then the sorted order is violeted.  Divide
+        // rem_val in differnt values of size p[k] and copy these values at
+        // different positions after p[k]
+        while (rem_val > partition[k])
+        {
+            partition[k+1] = partition[k];
+            rem_val = rem_val - partition[k];
+            k++;
+        }
+
+        // Copy rem_val to next position and increment position
+        partition[k+1] = rem_val;
+        numberOfPartition = k + 2;
+    }
+
+    private List<Integer> createNextPartitionSets(int[] partition, int numberOfPartition) {
+        List<Integer> nextPartition = new ArrayList<>();
+        for (int i = 0; i < numberOfPartition; i++) {
+            nextPartition.add(partition[i]);
+        }
+        return nextPartition;
     }
 
 }
