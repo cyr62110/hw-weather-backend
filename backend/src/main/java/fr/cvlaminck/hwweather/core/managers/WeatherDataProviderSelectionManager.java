@@ -29,7 +29,7 @@ public class WeatherDataProviderSelectionManager {
         this.providersByRefreshTypeMap = buildProvidersByRefreshTypeMap(weatherDataProviders);
     }
 
-    private Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> buildProvidersByRefreshTypeMap(Collection<WeatherDataProvider> weatherDataProviders) {
+    Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> buildProvidersByRefreshTypeMap(Collection<WeatherDataProvider> weatherDataProviders) {
         Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap = new HashMap<>();
         Set<ExternalWeatherDataType> types = Arrays.asList(ExternalWeatherDataType.values()).stream().collect(Collectors.toSet());
         for (int i = 1; i <= types.size(); i++) {
@@ -56,20 +56,74 @@ public class WeatherDataProviderSelectionManager {
                 .collect(Collectors.toList()); //FIXME
     }
 
-    private List<RefreshPlan> buildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh) {
+    private List<RefreshPlan> getOrBuildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh, Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap) {
+        //TODO add caching of refresh plans since they are quite expensive to build.
+        return buildRefreshPlans(typesToRefresh, providersByRefreshTypeMap);
+    }
+
+    List<RefreshPlan> buildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh, Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap) {
         List <RefreshPlan> refreshPlans = new ArrayList<>();
-        //First, we build all possible combinaison of providers that will be able to refresh the requested types.
         PartitionOfSetIterator<ExternalWeatherDataType> it = new PartitionOfSetIterator<>(typesToRefresh);
         while (it.hasNext()) {
-            refreshPlans.addAll(buildRefreshPlansForPartition(it.next()));
+            refreshPlans.addAll(buildRefreshPlansForPartition(typesToRefresh, it.next(), providersByRefreshTypeMap));
         }
-        //FIXME fix the maximum in config.
         return refreshPlans;
     }
 
-    private List<RefreshPlan> buildRefreshPlansForPartition(List<Set<ExternalWeatherDataType>> partition) {
+    List<RefreshPlan> buildRefreshPlansForPartition(Set<ExternalWeatherDataType> typesToRefresh, List<Set<ExternalWeatherDataType>> partition, Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap) {
         List<RefreshPlan> refreshPlans = new ArrayList<>();
-        //FIXME
+
+        List<List<WeatherDataProvider>> providersProvidingPartitionPart = partition.stream()
+                .map((p) -> providersByRefreshTypeMap.get(p))
+                .collect(Collectors.toList());
+
+        boolean listContainsProviderForAllPartitionPart = providersProvidingPartitionPart.stream()
+                .allMatch((p) -> p != null && !p.isEmpty());
+        if (!listContainsProviderForAllPartitionPart) {
+            return refreshPlans;
+        }
+
+        WeatherDataProvider[] providers = new WeatherDataProvider[partition.size()];
+        Iterator<WeatherDataProvider>[] iterators = new Iterator[partition.size()];
+
+        int i = 0;
+        iterators[0] = providersByRefreshTypeMap.get(partition.get(0)).iterator();
+        while (true) {
+            if (!iterators[i].hasNext()) {
+                iterators[i] = null;
+                if (i == 0) {
+                    break;
+                }
+                i --;
+            } else {
+                providers[i] = iterators[i].next();
+                //If the provider is already in the list of provider we will user
+                //TODO refactor in two boolean functions
+                boolean isAlreadyInList = false;
+                int j = i - 1;
+                while (!isAlreadyInList && j >= 0) {
+                    if (providers[i] == providers[j]) {
+                        isAlreadyInList = true;
+                    }
+                    j --;
+                }
+                if (isAlreadyInList) {
+                    continue;
+                }
+                //If the provider can refresh all the data by himself, it is useless to associate him to another provider
+                //in case of a partition of more than 1 element.
+                if (partition.size() > 1 && providers[i].getTypes().containsAll(typesToRefresh)) {
+                    continue;
+                }
+                if (i != partition.size() - 1) {
+                    iterators[i + 1] = providersProvidingPartitionPart.get(i + 1).iterator();
+                    i++;
+                } else {
+                    refreshPlans.add(new RefreshPlan(providers));
+                }
+            }
+        }
+
         return refreshPlans;
     }
 
@@ -83,6 +137,17 @@ public class WeatherDataProviderSelectionManager {
 
         public RefreshPlan(List<WeatherDataProvider> providersToUse) {
             this.providersToUse = providersToUse;
+        }
+
+        public RefreshPlan(WeatherDataProvider[] providers) {
+            this.providersToUse = new ArrayList<>();
+            for (WeatherDataProvider p : providers) {
+                this.providersToUse.add(p);
+            }
+        }
+
+        public List<WeatherDataProvider> getProvidersToUse() {
+            return Collections.unmodifiableList(providersToUse);
         }
 
         public int getNumberOfProvider() {

@@ -22,10 +22,10 @@ public class PartitionOfSetIteratorTest {
         assertFalse(it.hasNext());
     }
 
-    private List<Set<Integer>> partition(Integer... values) {
-        List<Set<Integer>> partition = new ArrayList<>();
-        Set<Integer> set = new HashSet<>();
-        for (Integer value: values) {
+    public static <T> List<Set<T>> partition(T... values) {
+        List<Set<T>> partition = new ArrayList<>();
+        Set set = new HashSet();
+        for (Object value: values) {
             if (value == null) {
                 partition.add(set);
                 set = new HashSet<>();
