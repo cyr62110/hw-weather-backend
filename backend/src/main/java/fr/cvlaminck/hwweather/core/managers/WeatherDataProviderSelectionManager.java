@@ -1,16 +1,15 @@
 package fr.cvlaminck.hwweather.core.managers;
 
-import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
 import fr.cvlaminck.hwweather.core.utils.stats.KSubsetOfNSetIterator;
+import fr.cvlaminck.hwweather.core.utils.stats.PartitionOfSetIterator;
 import fr.cvlaminck.hwweather.data.model.FreeCallCountersEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.repositories.FreeCallCountersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,7 @@ public class WeatherDataProviderSelectionManager {
         Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap = new HashMap<>();
         Set<ExternalWeatherDataType> types = Arrays.asList(ExternalWeatherDataType.values()).stream().collect(Collectors.toSet());
         for (int i = 1; i <= types.size(); i++) {
+            final int j = i;
             KSubsetOfNSetIterator<ExternalWeatherDataType> it = new KSubsetOfNSetIterator<>(types, i);
             it.forEachRemaining((subset) -> {
                 List<WeatherDataProvider> providersProvidingSubsetOfTypes = weatherDataProviders.stream()
@@ -56,10 +56,21 @@ public class WeatherDataProviderSelectionManager {
                 .collect(Collectors.toList()); //FIXME
     }
 
-    private List<RefreshPlan> buildRefreshPlans(Collection<WeatherDataType> typesToRefresh) {
-        //FIXME build all possible lists of data providers that can refresh all types
+    private List<RefreshPlan> buildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh) {
+        List <RefreshPlan> refreshPlans = new ArrayList<>();
+        //First, we build all possible combinaison of providers that will be able to refresh the requested types.
+        PartitionOfSetIterator<ExternalWeatherDataType> it = new PartitionOfSetIterator<>(typesToRefresh);
+        while (it.hasNext()) {
+            refreshPlans.addAll(buildRefreshPlansForPartition(it.next()));
+        }
         //FIXME fix the maximum in config.
-        return null; //FIXME
+        return refreshPlans;
+    }
+
+    private List<RefreshPlan> buildRefreshPlansForPartition(List<Set<ExternalWeatherDataType>> partition) {
+        List<RefreshPlan> refreshPlans = new ArrayList<>();
+        //FIXME
+        return refreshPlans;
     }
 
     private void sortPlansByDescendingCost() {
