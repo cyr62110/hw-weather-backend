@@ -43,4 +43,21 @@ public class FreeCallCountersRepositoryImpl
         WriteResult writeResult = mongoOperations.upsert(query, update, FreeCallCountersEntity.class);
         return freeCallCountersRepository.findOneByDay(today);
     }
+
+    @Override
+    public FreeCallCountersEntity decrement(Collection<String> counters) {
+        LocalDate today = LocalDate.now(ZoneId.of("UTC"));
+
+        Criteria criteria = Criteria.where("day").is(today);
+        Update update = new Update();
+        for (String counter : counters) {
+            String key = "counters."+counter;
+            criteria = criteria.and(key).gt(0);
+            update.inc(key, -1);
+        }
+        Query query = Query.query(criteria);
+
+        return mongoOperations.findAndModify(query, update, FreeCallCountersEntity.class);
+    }
+
 }

@@ -22,6 +22,11 @@ public class DarkSkyWeatherProvider
     }
 
     @Override
+    public boolean supportsPaidCall() {
+        return false; //FIXME return true once everything is written for non-free API.
+    }
+
+    @Override
     public Double getCostPerOperation() {
         return 0d; //FIXME: Set the real price of an operation
     }

@@ -17,6 +17,7 @@ public class PartitionOfSetIteratorTest {
 
         assertEquals(partition(1, 2, 3), it.next());
         assertEquals(partition(1, 2, null, 3), it.next());
+        assertEquals(partition(1, 3, null, 2), it.next());
         assertEquals(partition(1, null, 2, 3), it.next());
         assertEquals(partition(1, null, 2, null, 3), it.next());
         assertFalse(it.hasNext());

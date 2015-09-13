@@ -10,6 +10,12 @@ public interface WeatherDataProvider
         extends DataProvider {
 
     /**
+     * Returns true if the provider can still be called once the number of free operations
+     * per day is exhausted.
+     */
+    boolean supportsPaidCall();
+
+    /**
      * Returns the cost in dollars when we are doing a request on this provider
      */
     Double getCostPerOperation();

@@ -101,7 +101,7 @@ public class WeatherRefreshManager {
             return;
         }
         log.debug("Refreshing weather data for city '{}'. After filtering already refreshed information: {}", city, typesToRefresh);
-        List<WeatherDataProvider> dataProvidersToUse = weatherDataProviderSelectionManager.selectDataProvidersToUseForRefreshOperation(typesToRefresh);
+        List<WeatherDataProvider> dataProvidersToUse = null; //FIXME: weatherDataProviderSelectionManager.selectDataProvidersToUseForRefreshOperation(typesToRefresh);
 
     }
 

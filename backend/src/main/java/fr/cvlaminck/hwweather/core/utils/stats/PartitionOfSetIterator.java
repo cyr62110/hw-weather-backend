@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.utils.stats;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -7,63 +8,77 @@ public class PartitionOfSetIterator<T>
     implements Iterator<List<Set<T>>> {
 
     private List<T> sourceSet;
-    private PartitionOfNIterator it;
 
-    private List<Integer> partition = null;
+    private Boolean mtc = null;
+    private Integer p[] = null;
+    private Integer q[] = null;
+
 
     public PartitionOfSetIterator(Set<T> sourceSet) {
-        //TODO only work up to 3 element in the source set.
         this.sourceSet = sourceSet.stream().collect(Collectors.toList());
-        this.it = new PartitionOfNIterator(sourceSet.size());
     }
 
     @Override
     public boolean hasNext() {
-        return it.hasNext();
+        if (mtc == null) {
+            return true;
+        }
+        return mtc;
     }
 
     @Override
     public List<Set<T>> next() {
-        List<Set<T>> nextPartition = null;
-        if (partition == null) {
-            partition = it.next();
-            nextPartition = createNextPartition(partition);
-            if (isSymetric(partition)) {
-                partition = null;
-            } else {
-                Collections.reverse(partition);
+        if (mtc == null) {
+            mtc = false;
+            p = new Integer[sourceSet.size()];
+            q = new Integer[sourceSet.size()];
+        }
+        mtc = nexequ(sourceSet.size(), p, q, mtc);
+        return convertToNextPartition(q);
+    }
+
+    private List<Set<T>> convertToNextPartition(Integer[] q) {
+        Map<Integer, Set<T>> nextPartitionMap = new HashMap<>();
+        for (int i = 0; i < q.length; i ++) {
+            Set set = nextPartitionMap.get(q[i]);
+            if (set == null) {
+                set = new HashSet<>();
+                nextPartitionMap.put(q[i], set);
             }
+            set.add(sourceSet.get(i));
+        }
+
+        ArrayList<Set<T>> nextPartition = new ArrayList<>(nextPartitionMap.size());
+        nextPartition.addAll(nextPartitionMap.values());
+        return nextPartition;
+    }
+
+    private int nc;
+    private boolean nexequ(int n, Integer[] p, Integer[] q, boolean mtc) {
+        if (!mtc) {
+            nc = 1;
+            for (int i = 0; i < n; i++) {
+                q[i] = 1;
+            }
+            p[0] = n;
         } else {
-            nextPartition = createNextPartition(partition);
-            partition = null;
-        }
-        return nextPartition;
-    }
-
-    private boolean isSymetric(List<Integer> partition) {
-        if (partition.size() == 1) {
-            return true;
-        }
-        for (int i = 0; i < Math.floorDiv(partition.size(), 2); i++) {
-            if (partition.get(i) != partition.get(partition.size() - i - 1)) {
-                return false;
+            int m = n;
+            int l = q[m - 1];
+            while (p[l - 1] == 1) {
+                q[m - 1] = 1;
+                m = m - 1;
+                l = q[m - 1];
             }
-        }
-        return true;
-    }
-
-    private List<Set<T>> createNextPartition(List<Integer> partition) {
-        List<Set<T>> nextPartition = new ArrayList<>();
-        int i = 0;
-        for (int p : partition) {
-            Set set = new HashSet<>();
-            for (int j = 0; j < p; j++) {
-                set.add(sourceSet.get(i + j));
+            nc = nc + m - n;
+            p[0] = p[0] + n - m;
+            if (l == nc) {
+                nc = nc + 1;
+                p[nc - 1] = 0;
             }
-            i += p;
-            nextPartition.add(set);
+            q[m - 1] = l + 1;
+            p[l - 1] = p[l - 1] - 1;
+            p[l] = p[l] + 1;
         }
-        return nextPartition;
+        return nc != n;
     }
-
 }
