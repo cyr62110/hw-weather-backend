@@ -1,18 +1,19 @@
 package fr.cvlaminck.hwweather.core.external.model.weather;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ExternalHourlyForecastResource
         extends ExternalWeatherResource {
-    private Date hour;
+    private LocalDateTime hour;
     private ExternalWeatherCondition weatherCondition;
     private double temperature; //In celsius
 
-    public Date getHour() {
+    public LocalDateTime getHour() {
         return hour;
     }
 
-    public void setHour(Date hour) {
+    public void setHour(LocalDateTime hour) {
         this.hour = hour;
     }
 

@@ -7,6 +7,10 @@ import fr.cvlaminck.hwweather.core.external.providers.weather.darksky.resources.
 import org.springframework.stereotype.Component;
 import retrofit.RestAdapter;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 public class DarkSkyWeatherForecastUpdater {
@@ -41,7 +45,7 @@ public class DarkSkyWeatherForecastUpdater {
     private ExternalCurrentWeatherResource convertCurrentlyToResource(DarkSkyCurrentlyData data) {
         ExternalCurrentWeatherResource current = new ExternalCurrentWeatherResource();
         current.setProviderName(dataProvider.getProviderName());
-        current.setTime(getNormalizedDate(data));
+        current.setTime(getNormalizedDateTime(data));
         current.setTemperature(getNormalizedTemperature(data.getTemperature()));
         current.setWeatherCondition(getNormalizedWeatherCondition(data));
         return current;
@@ -66,7 +70,7 @@ public class DarkSkyWeatherForecastUpdater {
         for (DarkSkyHourlyData.Data data : hourlyData.getData()) {
             ExternalHourlyForecastResource resource = new ExternalHourlyForecastResource();
             resource.setProviderName(dataProvider.getProviderName());
-            resource.setHour(getNormalizedDate(data));
+            resource.setHour(getNormalizedDateTime(data));
             resource.setTemperature(getNormalizedTemperature(data.getTemperature()));
             resource.setWeatherCondition(getNormalizedWeatherCondition(data));
             resources.add(resource);
@@ -78,10 +82,14 @@ public class DarkSkyWeatherForecastUpdater {
         return TemperatureUnit.FAHRENHEIT.convertToCelsius(temperature);
     }
 
-    private Date getNormalizedDate(DarkSkyData data) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTimeInMillis(data.getTime());
-        return calendar.getTime();
+    private LocalDate getNormalizedDate(DarkSkyData data) {
+        Instant instant = Instant.ofEpochMilli(data.getTime());
+        return instant.atZone(ZoneId.of("UTC")).toLocalDate();
+    }
+
+    private LocalDateTime getNormalizedDateTime(DarkSkyData data) {
+        Instant instant = Instant.ofEpochMilli(data.getTime());
+        return instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
     }
 
     private ExternalWeatherCondition getNormalizedWeatherCondition(DarkSkyData data) {

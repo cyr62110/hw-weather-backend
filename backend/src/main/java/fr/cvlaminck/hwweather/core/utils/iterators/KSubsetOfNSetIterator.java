@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.core.utils.stats;
+package fr.cvlaminck.hwweather.core.utils.iterators;
 
 import java.util.HashSet;
 import java.util.Iterator;

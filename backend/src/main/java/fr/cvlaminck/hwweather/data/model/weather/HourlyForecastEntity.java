@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -20,7 +22,14 @@ public class HourlyForecastEntity
     private String cityId;
 
     @Indexed(expireAfterSeconds = 25 * 60 * 60)
-    private Date day;
+    private LocalDate day;
+
+    public HourlyForecastEntity() {
+    }
+
+    public HourlyForecastEntity(int expiryInSeconds, int gracePeriodInSeconds) {
+        super(expiryInSeconds, gracePeriodInSeconds);
+    }
 
     private Collection<ByHourForecast> hourByHourForecasts = new ArrayList<>();
 
@@ -36,11 +45,11 @@ public class HourlyForecastEntity
         this.cityId = cityId;
     }
 
-    public Date getDay() {
+    public LocalDate getDay() {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(LocalDate day) {
         this.day = day;
     }
 
@@ -54,17 +63,17 @@ public class HourlyForecastEntity
 
     public static class ByHourForecast {
 
-        private Date hour;
+        private LocalDateTime hour;
 
         private double temperature;
 
         private WeatherConditionEntity weatherCondition;
 
-        public Date getHour() {
+        public LocalDateTime getHour() {
             return hour;
         }
 
-        public void setHour(Date hour) {
+        public void setHour(LocalDateTime hour) {
             this.hour = hour;
         }
 

@@ -11,11 +11,20 @@ public abstract class ExpirableEntity {
     /**
      * When the entity has been refreshed for the last time.
      */
-    private Date refreshTime;
+    private LocalDateTime refreshTime;
 
     private int gracePeriodInSeconds;
 
     private int expiryInSeconds;
+
+    protected ExpirableEntity() {
+    }
+
+    protected ExpirableEntity(int expiryInSeconds, int gracePeriodInSeconds) {
+        this.refreshTime = LocalDateTime.now(ZoneId.of("UTC"));
+        this.gracePeriodInSeconds = gracePeriodInSeconds;
+        this.expiryInSeconds = expiryInSeconds;
+    }
 
     public boolean isInGracePeriod() {
         if (isExpired()) {
@@ -33,7 +42,7 @@ public abstract class ExpirableEntity {
     }
 
     public OffsetDateTime getRefreshTime() {
-        return refreshTime.toInstant().atOffset(ZoneOffset.UTC);
+        return refreshTime.atOffset(ZoneOffset.UTC);
     }
 
     public OffsetDateTime getGracePeriodStartTime() {

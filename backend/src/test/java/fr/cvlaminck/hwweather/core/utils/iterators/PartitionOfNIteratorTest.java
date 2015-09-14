@@ -1,10 +1,6 @@
-package fr.cvlaminck.hwweather.core.utils.stats;
+package fr.cvlaminck.hwweather.core.utils.iterators;
 
 import org.junit.Test;
-
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class PartitionOfNIteratorTest {
 

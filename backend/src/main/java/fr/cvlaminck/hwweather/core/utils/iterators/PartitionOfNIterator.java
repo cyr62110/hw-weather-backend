@@ -1,7 +1,6 @@
-package fr.cvlaminck.hwweather.core.utils.stats;
+package fr.cvlaminck.hwweather.core.utils.iterators;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 // http://www.geeksforgeeks.org/generate-unique-partitions-of-an-integer/
 public class PartitionOfNIterator

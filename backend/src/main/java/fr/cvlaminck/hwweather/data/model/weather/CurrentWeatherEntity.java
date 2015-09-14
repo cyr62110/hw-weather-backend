@@ -25,6 +25,13 @@ public class CurrentWeatherEntity
 
     private WeatherConditionEntity weatherCondition;
 
+    public CurrentWeatherEntity() {
+    }
+
+    public CurrentWeatherEntity(int expiryInSeconds, int gracePeriodInSeconds) {
+        super(expiryInSeconds, gracePeriodInSeconds);
+    }
+
     public String getId() {
         return id;
     }

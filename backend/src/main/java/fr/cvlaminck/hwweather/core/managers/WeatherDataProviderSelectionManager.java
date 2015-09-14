@@ -3,20 +3,19 @@ package fr.cvlaminck.hwweather.core.managers;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
-import fr.cvlaminck.hwweather.core.utils.stats.KSubsetOfNSetIterator;
-import fr.cvlaminck.hwweather.core.utils.stats.PartitionOfSetIterator;
+import fr.cvlaminck.hwweather.core.model.RefreshPlan;
+import fr.cvlaminck.hwweather.core.utils.iterators.KSubsetOfNSetIterator;
+import fr.cvlaminck.hwweather.core.utils.iterators.PartitionOfSetIterator;
 import fr.cvlaminck.hwweather.data.model.FreeCallCountersEntity;
-import fr.cvlaminck.hwweather.data.model.WeatherDataType;
-import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.data.repositories.FreeCallCountersRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.Ref;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class WeatherDataProviderSelectionManager {
@@ -56,9 +55,9 @@ public class WeatherDataProviderSelectionManager {
         return providersByRefreshTypeMap;
     }
 
-    public List<WeatherDataProvider> selectDataProvidersToUseForRefreshOperation(Collection<WeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+    public List<WeatherDataProvider> selectDataProvidersToUseForRefreshOperation(Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
         //We build all possible refresh plan for the types we want to refresh
-        Set<RefreshPlan> refreshPlans = getOrBuildRefreshPlans(convertTypes(typesToRefresh), providersByRefreshTypeMap);
+        Set<RefreshPlan> refreshPlans = getOrBuildRefreshPlans(typesToRefresh, providersByRefreshTypeMap);
         RefreshPlan refreshPlan = null;
 
         while (refreshPlan == null) {
@@ -83,19 +82,6 @@ public class WeatherDataProviderSelectionManager {
             }
         }
         return refreshPlan.getProvidersToUse().stream().collect(Collectors.toList());
-    }
-
-    private Set<ExternalWeatherDataType> convertTypes(Collection<WeatherDataType> types) {
-        return types.stream()
-                .map((type) -> {
-                    switch (type) {
-                        case WEATHER: return ExternalWeatherDataType.CURRENT;
-                        case HOURLY_FORECAST: return ExternalWeatherDataType.HOURLY;
-                        case DAILY_FORECAST: return ExternalWeatherDataType.DAILY;
-                    }
-                    throw new IllegalArgumentException(); //TODO do proper exception for this case
-                })
-                .collect(Collectors.toSet());
     }
 
     private Set<RefreshPlan> getOrBuildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh, Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap) {
@@ -189,7 +175,12 @@ public class WeatherDataProviderSelectionManager {
     }
 
     private Optional<RefreshPlan> findBestRefreshPlan(Set<RefreshPlan> refreshPlans, FreeCallCountersEntity freeCallCounters) {
-         return refreshPlans.stream()
+         return sortRefreshPlanToFindBestOne(refreshPlans, freeCallCounters)
+                .findFirst();
+    }
+
+    Stream<RefreshPlan> sortRefreshPlanToFindBestOne(Set<RefreshPlan> refreshPlans, FreeCallCountersEntity freeCallCounters) {
+        return refreshPlans.stream()
                 .filter((p) -> p.canAllProvidersBeCalled(freeCallCounters))
                 .sorted((p1, p2) -> {
                     int orderByCost = Double.compare(p1.getCost(freeCallCounters), p2.getCost(freeCallCounters));
@@ -198,90 +189,7 @@ public class WeatherDataProviderSelectionManager {
                     if (orderByNumberOfProvider != 0) return orderByNumberOfProvider;
                     int orderByOverlap = Integer.compare(p1.getOverlap(), p2.getOverlap());
                     if (orderByOverlap != 0) return orderByOverlap;
-                    return Integer.compare(p1.hashCode(), p2.hashCode()); //TODO: By number of quer
-                })
-                .findFirst();
+                    return Integer.compare(p1.hashCode(), p2.hashCode()); //TODO: By minimum of free query left across providers.
+                });
     }
-
-    /* package */ static class RefreshPlan {
-
-        private Set<WeatherDataProvider> providersToUse;
-
-        RefreshPlan(List<WeatherDataProvider> providersToUse) {
-            this.providersToUse = providersToUse.stream().collect(Collectors.toSet());
-        }
-
-        public RefreshPlan(WeatherDataProvider[] providers) {
-            this.providersToUse = new HashSet<>();
-            for (WeatherDataProvider p : providers) {
-                this.providersToUse.add(p);
-            }
-        }
-
-        public Set<WeatherDataProvider> getProvidersToUse() {
-            return Collections.unmodifiableSet(providersToUse);
-        }
-
-        public Collection<String> getFreeCalls(FreeCallCountersEntity freeCallCounters) {
-            return providersToUse.stream()
-                    .filter((p) -> freeCallCounters.getCounters().get(p.getProviderName()) > 0)
-                    .map(WeatherDataProvider::getProviderName)
-                    .collect(Collectors.toList());
-        }
-
-        public int getNumberOfProvider() {
-            return providersToUse.size();
-        }
-
-        /**
-         * Returns false if one of the provider required for this refresh plan cannot be called anymore.
-         */
-        public boolean canAllProvidersBeCalled(FreeCallCountersEntity freeCallCounters) {
-            //TODO Add configuration to say if we authorize paid call for a given provider
-            return providersToUse.stream()
-                    .filter((p) -> freeCallCounters.getCounters().get(p.getProviderName()) <= 0)
-                    .allMatch(WeatherDataProvider::supportsPaidCall);
-        }
-
-        /**
-         * Returns the number of times a type will be refreshed by more
-         * than one data provider in this plan.
-         * <p>
-         * ex: p1(CURRENT, DAILY); p2(CURRENT, MONTHLY) -> returns 1 since CURRENT will be refresh twice.
-         */
-        public int getOverlap() {
-            return providersToUse.stream()
-                    .flatMap((provider) -> provider.getTypes().stream())
-                    .collect(Collectors.toMap(
-                            (type) -> type,
-                            (value) -> 1,
-                            (a, b) -> a + b
-                            ))
-                    .entrySet().stream()
-                    .collect(Collectors.summingInt(entry -> entry.getValue() - 1));
-        }
-
-        /**
-         * Returns the cost of this refresh plan
-         */
-        public double getCost(FreeCallCountersEntity freeCallCounters) {
-            return providersToUse.stream()
-                    .filter((p) -> freeCallCounters.getCounters().get(p.getProviderName()) <= 0)
-                    .collect(Collectors.summingDouble(WeatherDataProvider::getCostPerOperation));
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof RefreshPlan)) return false;
-            RefreshPlan that = (RefreshPlan) o;
-            return Objects.equals(providersToUse, that.providersToUse);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(providersToUse);
-        }
-    }
-
 }

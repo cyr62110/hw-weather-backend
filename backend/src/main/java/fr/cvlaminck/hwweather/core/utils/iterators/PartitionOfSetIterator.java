@@ -1,6 +1,5 @@
-package fr.cvlaminck.hwweather.core.utils.stats;
+package fr.cvlaminck.hwweather.core.utils.iterators;
 
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 

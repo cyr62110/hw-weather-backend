@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.managers;
 
+import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
@@ -14,11 +15,10 @@ public class WeatherDataProviderManager {
     @Autowired
     private List<WeatherDataProvider> dataProviders;
 
-    public ExternalWeatherData refresh(double latitude, double longitude) {
-        return refresh(latitude, longitude, Arrays.asList(ExternalWeatherDataType.values()));
-    }
+    @Autowired
+    private WeatherDataProviderSelectionManager weatherDataProviderSelectionManager;
 
-    public ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh) {
+    public ExternalWeatherData refresh(double latitude, double longitude, Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
         ExternalWeatherData data = new ExternalWeatherData();
 
         //Set of types of weather data that has not been refreshed by another provider in the list.
@@ -36,10 +36,8 @@ public class WeatherDataProviderManager {
         return data;
     }
 
-    private Collection<WeatherDataProvider> getBestProvidersForRefreshOperation(Collection<ExternalWeatherDataType> typesToRefresh) {
-        //FIXME for now, we have only one API, so we dont care too much about that.
-        //FIXME implements atomic counter to limit the number of request that can on a data provider to the free request limit.
-        return dataProviders;
+    private Collection<WeatherDataProvider> getBestProvidersForRefreshOperation(Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+        return weatherDataProviderSelectionManager.selectDataProvidersToUseForRefreshOperation(typesToRefresh);
     }
 
     /**
@@ -51,10 +49,10 @@ public class WeatherDataProviderManager {
         if (d1.getCurrent() == null) {
             d1.setCurrent(d2.getCurrent());
         }
-        if (d1.getHourly().isEmpty()) {
+        if (d1.getHourly() == null || d1.getHourly().isEmpty()) {
             d1.setHourly(d2.getHourly());
         }
-        if (d1.getDaily().isEmpty()) {
+        if (d1.getDaily() == null || d1.getDaily().isEmpty()) {
             d1.setDaily(d2.getDaily());
         }
         return d1;

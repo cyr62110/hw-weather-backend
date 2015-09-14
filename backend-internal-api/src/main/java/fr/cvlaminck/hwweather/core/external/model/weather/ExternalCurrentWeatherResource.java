@@ -1,18 +1,19 @@
 package fr.cvlaminck.hwweather.core.external.model.weather;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ExternalCurrentWeatherResource
         extends ExternalWeatherResource {
-    private Date time;
+    private LocalDateTime time;
     private ExternalWeatherCondition weatherCondition;
     private double temperature; //In celsius;
 
-    public Date getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
-    public void setTime(Date time) {
+    public void setTime(LocalDateTime time) {
         this.time = time;
     }
 

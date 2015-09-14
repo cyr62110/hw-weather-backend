@@ -1,19 +1,20 @@
 package fr.cvlaminck.hwweather.core.external.model.weather;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class ExternalDailyForecastResource
         extends ExternalWeatherResource {
-    private Date day;
+    private LocalDate day;
     private ExternalWeatherCondition weatherCondition;
     private double minTemperature; //In celsius
     private double maxTemperature; //In celsius
 
-    public Date getDay() {
+    public LocalDate getDay() {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(LocalDate day) {
         this.day = day;
     }
 

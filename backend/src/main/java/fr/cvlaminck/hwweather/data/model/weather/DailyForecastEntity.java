@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -20,9 +22,16 @@ public class DailyForecastEntity
     private String cityId;
 
     @Indexed(expireAfterSeconds = (int) (7.5 * 24 * 60 * 60))
-    private Date week;
+    private LocalDate week;
 
-    private Collection<ByDayForecast> dayByDayForecasts = Collections.emptyList();
+    private Collection<ByDayForecast> dayByDayForecasts = new ArrayList<>();
+
+    public DailyForecastEntity() {
+    }
+
+    public DailyForecastEntity(int expiryInSeconds, int gracePeriodInSeconds) {
+        super(expiryInSeconds, gracePeriodInSeconds);
+    }
 
     public String getId() {
         return id;
@@ -36,11 +45,11 @@ public class DailyForecastEntity
         this.cityId = cityId;
     }
 
-    public Date getWeek() {
+    public LocalDate getWeek() {
         return week;
     }
 
-    public void setWeek(Date week) {
+    public void setWeek(LocalDate week) {
         this.week = week;
     }
 
@@ -54,7 +63,7 @@ public class DailyForecastEntity
 
     public static class ByDayForecast {
 
-        private Date day;
+        private LocalDate day;
 
         private double minTemperature;
 
@@ -62,11 +71,11 @@ public class DailyForecastEntity
 
         private WeatherConditionEntity weatherCondition;
 
-        public Date getDay() {
+        public LocalDate getDay() {
             return day;
         }
 
-        public void setDay(Date day) {
+        public void setDay(LocalDate day) {
             this.day = day;
         }
 
