@@ -46,19 +46,22 @@ public class MessageBrokerConfig {
     }
 
     @Bean
-    TopicExchange hwWeatherExchange() {
-        return new TopicExchange("hwweather");
+    public TopicExchange weatherRefreshOperationExchange() {
+        return new TopicExchange("weather-refresh-operation");
     }
 
     @Bean
-    Queue weatherRefreshOperationQueue() {
+    public TopicExchange weatherRefreshOperationResultExchange() { return new TopicExchange("weather-refresh-operation-result"); }
+
+    @Bean
+    public Queue weatherRefreshOperationQueue() {
         return new Queue("weather-refresh-operation", true);
     }
 
     @Bean
     @Autowired
-    Binding weatherRefreshOperationBinding(Queue weatherRefreshOperationQueue, TopicExchange hwWeatherExchange) {
-        return BindingBuilder.bind(weatherRefreshOperationQueue).to(hwWeatherExchange).with("weather-refresh-operation");
+    public Binding weatherRefreshOperationBinding(Queue weatherRefreshOperationQueue, TopicExchange weatherRefreshOperationExchange) {
+        return BindingBuilder.bind(weatherRefreshOperationQueue).to(weatherRefreshOperationExchange).with("weather-refresh-operation");
     }
 
     @Bean

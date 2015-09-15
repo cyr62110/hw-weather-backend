@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.managers;
 
+import fr.cvlaminck.hwweather.core.utils.DateUtils;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.data.model.weather.CurrentWeatherEntity;
 import fr.cvlaminck.hwweather.data.repositories.CurrentWeatherRepository;
@@ -16,7 +17,7 @@ public class WeatherManager {
     private WeatherRefreshManager refreshManager;
 
     public CurrentWeatherEntity getCurrentWeather(CityEntity city) {
-        return null;
+        return currentWeatherRepository.findByCityIdAndDay(city.getId(), DateUtils.today());
     }
 
 }

@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.data.model.weather;
 
 import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
+import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,7 +14,7 @@ import java.util.Date;
 
 @Document(collection = "weather.daily")
 public class DailyForecastEntity
-    extends ExpirableEntity {
+    extends AbstractWeatherDataEntity {
 
     @Id
     private String id;
@@ -31,6 +32,11 @@ public class DailyForecastEntity
 
     public DailyForecastEntity(int expiryInSeconds, int gracePeriodInSeconds) {
         super(expiryInSeconds, gracePeriodInSeconds);
+    }
+
+    @Override
+    public WeatherDataType getType() {
+        return WeatherDataType.DAILY_FORECAST;
     }
 
     public String getId() {

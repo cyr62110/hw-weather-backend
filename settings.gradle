@@ -4,4 +4,5 @@ include 'backend'
 include 'weather-provider-dark-sky'
 
 include 'city-provider-nominatim'
+include 'backend-client-api'
 
