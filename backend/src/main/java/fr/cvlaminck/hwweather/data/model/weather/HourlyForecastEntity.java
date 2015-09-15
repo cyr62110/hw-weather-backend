@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-@Document(collection = "weather.hourly")
+@Document(collection = "hourly")
 public class HourlyForecastEntity
     extends AbstractWeatherDataEntity {
 
