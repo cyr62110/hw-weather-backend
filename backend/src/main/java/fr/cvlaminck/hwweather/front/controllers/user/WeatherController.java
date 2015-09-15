@@ -1,10 +1,10 @@
 package fr.cvlaminck.hwweather.front.controllers.user;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
+import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherManager;
-import fr.cvlaminck.hwweather.core.managers.WeatherRefreshManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshQueuesManager;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
@@ -31,10 +31,10 @@ public class WeatherController {
     private WeatherRefreshQueuesManager weatherRefreshQueuesManager;
 
     @RequestMapping(method = RequestMethod.GET, value = "/current")
-    public CurrentWeatherEntity getCurrent(@PathVariable String cityId) throws CityDataProviderException, NoProviderWithNameException {
+    public CurrentWeatherEntity getCurrent(@PathVariable String cityId) throws CityDataProviderException, NoProviderWithNameException, NoResultForWeatherRefreshOperationException {
         CityEntity city = cityManager.getCity(cityId, "en-US"); //TODO handle language
         CurrentWeatherEntity current = weatherManager.getCurrentWeather(city);
-        weatherRefreshQueuesManager.postRefreshOperationForCityIfNecessary(city, Arrays.asList(current), Arrays.asList(WeatherDataType.WEATHER));
+        weatherRefreshQueuesManager.postRefreshOperationForCityAndWaitIfNecessary(city, Arrays.asList(current), Arrays.asList(WeatherDataType.WEATHER));
         return current;
     }
 

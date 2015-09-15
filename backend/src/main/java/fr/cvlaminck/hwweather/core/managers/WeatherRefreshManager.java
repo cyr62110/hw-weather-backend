@@ -2,7 +2,6 @@ package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.model.weather.*;
-import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationMessage;
 import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
@@ -13,19 +12,11 @@ import fr.cvlaminck.hwweather.data.model.weather.WeatherConditionEntity;
 import fr.cvlaminck.hwweather.data.repositories.CurrentWeatherRepository;
 import fr.cvlaminck.hwweather.data.repositories.DailyForecastRepository;
 import fr.cvlaminck.hwweather.data.repositories.HourlyForecastRepository;
-import org.omg.CORBA.Current;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,17 +46,33 @@ public class WeatherRefreshManager {
         CurrentWeatherEntity current = getCurrentWeatherFromData(city, data);
         if (current != null) {
             refreshedTypes.add(WeatherDataType.WEATHER);
+            CurrentWeatherEntity olderCurrent = currentWeatherRepository.findByCityIdAndDay(current.getCityId(), current.getDay());
+            if (olderCurrent != null) {
+                current.setId(olderCurrent.getId());
+            }
             currentWeatherRepository.save(current);
         }
-        HourlyForecastEntity hourly = getHourlyForecastFromData(city, data);
-        if (hourly != null) {
-            refreshedTypes.add(WeatherDataType.DAILY_FORECAST);
-            hourlyForecastRepository.save(hourly);
-        }
-        DailyForecastEntity daily = getDailyForecastFromData(city, data);
-        if (daily != null) {
+        Collection<HourlyForecastEntity> hourlyForecasts = getHourlyForecastsFromData(city, data);
+        if (hourlyForecasts != null) {
             refreshedTypes.add(WeatherDataType.HOURLY_FORECAST);
-            dailyForecastRepository.save(daily);
+            for (HourlyForecastEntity hourly : hourlyForecasts) {
+                HourlyForecastEntity olderHourly = hourlyForecastRepository.findByCityIdAndDay(hourly.getCityId(), hourly.getDay());
+                if (olderHourly != null) {
+                    hourly.setId(olderHourly.getId());
+                }
+                hourlyForecastRepository.save(hourly);
+            }
+        }
+        Collection<DailyForecastEntity> dailyForecasts = getDailyForecastsFromData(city, data);
+        if (dailyForecasts != null) {
+            refreshedTypes.add(WeatherDataType.DAILY_FORECAST);
+            for (DailyForecastEntity daily : dailyForecasts) {
+                DailyForecastEntity olderDaily = dailyForecastRepository.findByCityIdAndWeek(daily.getCityId(), daily.getWeek());
+                if (olderDaily != null) {
+                    daily.setId(olderDaily.getId());
+                }
+                dailyForecastRepository.save(daily);
+            }
         }
         return refreshedTypes;
     }
@@ -136,43 +143,58 @@ public class WeatherRefreshManager {
         return current;
     }
 
-    private HourlyForecastEntity getHourlyForecastFromData(CityEntity city, ExternalWeatherData data) {
+    private Collection<HourlyForecastEntity> getHourlyForecastsFromData(CityEntity city, ExternalWeatherData data) {
         if (data.getHourly() == null || data.getHourly().isEmpty()) {
             return null;
         }
 
+        Map<LocalDate, HourlyForecastEntity> hourlyMap = new HashMap<>();
+
         int expiryInSeconds = getExpiryInSecond(WeatherDataType.HOURLY_FORECAST);
         int gracePeriodInSeconds = getGracePeriodInSeconds(WeatherDataType.HOURLY_FORECAST);
 
-        HourlyForecastEntity hourly = new HourlyForecastEntity(expiryInSeconds, gracePeriodInSeconds);
-        hourly.setCityId(city.getId());
-        hourly.setDay(data.getHourly().iterator().next().getHour().toLocalDate());
         for (ExternalHourlyForecastResource resource : data.getHourly()) {
+            LocalDate date = resource.getHour().toLocalDate();
+            HourlyForecastEntity hourly = hourlyMap.get(date);
+            if (hourly == null) {
+                hourly = new HourlyForecastEntity(expiryInSeconds, gracePeriodInSeconds);
+                hourly.setCityId(city.getId());
+                hourly.setDay(date);
+                hourlyMap.put(date, hourly);
+            }
+
             HourlyForecastEntity.ByHourForecast byHour = new HourlyForecastEntity.ByHourForecast();
             byHour.setHour(resource.getHour());
             byHour.setWeatherCondition(toWeatherCondition(resource.getWeatherCondition()));
             byHour.setTemperature(resource.getTemperature());
+
             hourly.getHourByHourForecasts().add(byHour);
         }
-        return hourly;
+        return hourlyMap.values();
     }
 
-    private DailyForecastEntity getDailyForecastFromData(CityEntity city, ExternalWeatherData data) {
+    private Collection<DailyForecastEntity> getDailyForecastsFromData(CityEntity city, ExternalWeatherData data) {
         if (data.getDaily() == null || data.getDaily().isEmpty()) {
             return null;
         }
 
+        Map<LocalDate, DailyForecastEntity> dailyMap = new HashMap<>();
+
         int expiryInSeconds = getExpiryInSecond(WeatherDataType.DAILY_FORECAST);
         int gracePeriodInSeconds = getGracePeriodInSeconds(WeatherDataType.DAILY_FORECAST);
 
-        LocalDate day = data.getDaily().iterator().next().getDay();
-        LocalDate atStartOfWeek = day
-                .minusDays(day.getDayOfWeek().getValue() - 1);
-
-        DailyForecastEntity daily = new DailyForecastEntity(expiryInSeconds, gracePeriodInSeconds);
-        daily.setCityId(city.getId());
-        daily.setWeek(atStartOfWeek);
         for (ExternalDailyForecastResource resource : data.getDaily()) {
+            LocalDate day = resource.getDay();
+            LocalDate atStartOfWeek = day
+                    .minusDays(day.getDayOfWeek().getValue() - 1);
+            DailyForecastEntity daily = dailyMap.get(atStartOfWeek);
+            if (daily == null) {
+                daily = new DailyForecastEntity(expiryInSeconds, gracePeriodInSeconds);
+                daily.setCityId(city.getId());
+                daily.setWeek(atStartOfWeek);
+                dailyMap.put(atStartOfWeek, daily);
+            }
+
             DailyForecastEntity.ByDayForecast byDay = new DailyForecastEntity.ByDayForecast();
             byDay.setDay(resource.getDay());
             byDay.setWeatherCondition(toWeatherCondition(resource.getWeatherCondition()));
@@ -180,7 +202,7 @@ public class WeatherRefreshManager {
             byDay.setMinTemperature(resource.getMinTemperature());
             daily.getDayByDayForecasts().add(byDay);
         }
-        return daily;
+        return dailyMap.values();
     }
 
     private WeatherConditionEntity toWeatherCondition(ExternalWeatherCondition weatherCondition) {

@@ -39,6 +39,10 @@ public class DailyForecastEntity
         return WeatherDataType.DAILY_FORECAST;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getId() {
         return id;
     }

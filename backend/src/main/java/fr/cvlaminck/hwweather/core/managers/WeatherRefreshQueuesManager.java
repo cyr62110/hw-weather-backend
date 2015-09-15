@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.managers;
 
+import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationMessage;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationResultMessage;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
@@ -48,7 +49,7 @@ public class WeatherRefreshQueuesManager {
         return resultQueue;
     }
 
-    public void postRefreshOperationForCityIfNecessary(CityEntity city, List<AbstractWeatherDataEntity> weatherData, Collection<WeatherDataType> wantedTypes) {
+    public void postRefreshOperationForCityAndWaitIfNecessary(CityEntity city, List<AbstractWeatherDataEntity> weatherData, Collection<WeatherDataType> wantedTypes) throws NoResultForWeatherRefreshOperationException {
         Collection<WeatherDataType> typesToRefresh = new ArrayList<>();
         typesToRefresh.addAll(wantedTypes);
 
@@ -67,6 +68,7 @@ public class WeatherRefreshQueuesManager {
             postRefreshForCity(city, typesToRefresh);
             if (waitForResult) {
                 waitUntilCityWeatherIsRefreshed(city, typesToRefresh);
+                //TODO: reload result for database
             }
         } else {
             log.info("All weather data are available for city '{}'. Types: {}", wantedTypes);
@@ -86,15 +88,37 @@ public class WeatherRefreshQueuesManager {
                 message);
     }
 
-    public void waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
+    public void waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
+        //We declare the queue for receiving weather update and bind it to the right exchange
         Queue resultQueue = getQueueForCity(city);
 
-        WeatherRefreshOperationResultMessage message = (WeatherRefreshOperationResultMessage) amqpTemplate.receiveAndConvert(resultQueue.getName());
+        //TODO get timeout from configuration
+        //TODO Find a better way than polling
+        WeatherRefreshOperationResultMessage message = null;
+        long startTime = System.currentTimeMillis();
+        long timeout = 60000l; //For now, 5s
+        long timeBetweenPoll = 500; //For now, 500ms
+
+        try {
+            while (message == null && (System.currentTimeMillis() - startTime) < timeout) {
+                message = (WeatherRefreshOperationResultMessage) amqpTemplate.receiveAndConvert(resultQueue.getName());
+                if (message == null) {
+                    Thread.sleep(timeBetweenPoll);
+                }
+            }
+        } catch (InterruptedException e) {}
+
+        //We delete the queue since it is no more necessary
+        amqpAdmin.deleteQueue(resultQueue.getName());
+
+        if (message == null) {
+            throw new NoResultForWeatherRefreshOperationException();
+        }
+
         log.debug("{} {}", message.getCityId(), message.getRefreshedTypes());
         if (!message.getRefreshedTypes().containsAll(typesToRefresh)) {
             //TODO wait for another message
-            //TODO add a maximum time to wait for a refresh operation: ex. 60s.
-            throw new RuntimeException("All types not refreshed");
+            throw new NoResultForWeatherRefreshOperationException();
         }
     }
 
