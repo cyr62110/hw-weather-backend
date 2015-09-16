@@ -24,6 +24,7 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.14'
 
     compile project(':backend-internal-api')
+    compile project(':backend-client-api')
     compile project(':city-provider-nominatim')
     compile project(':weather-provider-dark-sky')
 

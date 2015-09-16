@@ -49,29 +49,10 @@ public class WeatherRefreshQueuesManager {
         return resultQueue;
     }
 
-    public void postRefreshOperationForCityAndWaitIfNecessary(CityEntity city, List<AbstractWeatherDataEntity> weatherData, Collection<WeatherDataType> wantedTypes) throws NoResultForWeatherRefreshOperationException {
-        Collection<WeatherDataType> typesToRefresh = new ArrayList<>();
-        typesToRefresh.addAll(wantedTypes);
-
-        boolean waitForResult = false;
-
-        for (AbstractWeatherDataEntity data : weatherData) {
-            if (data == null || data.isExpired()) {
-                waitForResult = true;
-            } else if (!data.isExpiredOrInGracePeriod()) {
-                typesToRefresh.remove(data.getType());
-            }
-        }
-
+    public void postRefreshOperationForCityAndWaitForResult(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
         if (!typesToRefresh.isEmpty()) {
-            log.info("Posting refresh operation for city '{}'. Types to refresh: {}", city.getId(), typesToRefresh);
             postRefreshForCity(city, typesToRefresh);
-            if (waitForResult) {
-                waitUntilCityWeatherIsRefreshed(city, typesToRefresh);
-                //TODO: reload result for database
-            }
-        } else {
-            log.info("All weather data are available for city '{}'. Types: {}", wantedTypes);
+            waitUntilCityWeatherIsRefreshed(city, typesToRefresh);
         }
     }
 
@@ -79,13 +60,17 @@ public class WeatherRefreshQueuesManager {
      * City are not refresh immediately by the front. To avoid useless simultaneous call to external weather API,
      * a message is posted in a queue of the message broker representing a refresh operation for a given city.
      */
-    private void postRefreshForCity(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
-        WeatherRefreshOperationMessage message = new WeatherRefreshOperationMessage();
-        message.setCityId(city.getId());
-        message.setTypesToRefresh(typesToRefresh);
+    public void postRefreshForCity(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
+        if (!typesToRefresh.isEmpty()) {
+            log.info("Posting refresh operation for city '{}'. Types to refresh: {}", city.getId(), typesToRefresh);
 
-        amqpTemplate.convertAndSend(weatherRefreshOperationQueue.getName(),
-                message);
+            WeatherRefreshOperationMessage message = new WeatherRefreshOperationMessage();
+            message.setCityId(city.getId());
+            message.setTypesToRefresh(typesToRefresh);
+
+            amqpTemplate.convertAndSend(weatherRefreshOperationQueue.getName(),
+                    message);
+        }
     }
 
     public void waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
