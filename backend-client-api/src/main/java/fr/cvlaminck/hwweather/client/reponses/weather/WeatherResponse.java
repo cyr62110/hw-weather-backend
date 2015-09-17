@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.client.reponses;
+package fr.cvlaminck.hwweather.client.reponses.weather;
 
 import fr.cvlaminck.hwweather.client.resources.CityResource;
 import fr.cvlaminck.hwweather.client.resources.weather.CurrentWeatherResource;

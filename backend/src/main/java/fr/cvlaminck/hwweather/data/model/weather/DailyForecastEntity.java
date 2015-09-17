@@ -1,6 +1,5 @@
 package fr.cvlaminck.hwweather.data.model.weather;
 
-import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -9,8 +8,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
 
 @Document(collection = "daily")
 public class DailyForecastEntity
@@ -75,9 +72,9 @@ public class DailyForecastEntity
 
         private LocalDate day;
 
-        private double minTemperature;
+        private double minTemperatureInCelsius;
 
-        private double maxTemperature;
+        private double maxTemperatureInCelsius;
 
         private WeatherConditionEntity weatherCondition;
 
@@ -89,20 +86,20 @@ public class DailyForecastEntity
             this.day = day;
         }
 
-        public double getMinTemperature() {
-            return minTemperature;
+        public double getMinTemperatureInCelsius() {
+            return minTemperatureInCelsius;
         }
 
-        public void setMinTemperature(double minTemperature) {
-            this.minTemperature = minTemperature;
+        public void setMinTemperatureInCelsius(double minTemperatureInCelsius) {
+            this.minTemperatureInCelsius = minTemperatureInCelsius;
         }
 
-        public double getMaxTemperature() {
-            return maxTemperature;
+        public double getMaxTemperatureInCelsius() {
+            return maxTemperatureInCelsius;
         }
 
-        public void setMaxTemperature(double maxTemperature) {
-            this.maxTemperature = maxTemperature;
+        public void setMaxTemperatureInCelsius(double maxTemperatureInCelsius) {
+            this.maxTemperatureInCelsius = maxTemperatureInCelsius;
         }
 
         public WeatherConditionEntity getWeatherCondition() {

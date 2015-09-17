@@ -1,6 +1,5 @@
 package fr.cvlaminck.hwweather.data.model.weather;
 
-import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 
 @Document(collection = "hourly")
 public class HourlyForecastEntity
@@ -75,7 +73,7 @@ public class HourlyForecastEntity
 
         private LocalDateTime hour;
 
-        private double temperature;
+        private double temperatureInCelsius;
 
         private WeatherConditionEntity weatherCondition;
 
@@ -87,12 +85,12 @@ public class HourlyForecastEntity
             this.hour = hour;
         }
 
-        public double getTemperature() {
-            return temperature;
+        public double getTemperatureInCelsius() {
+            return temperatureInCelsius;
         }
 
-        public void setTemperature(double temperature) {
-            this.temperature = temperature;
+        public void setTemperatureInCelsius(double temperatureInCelsius) {
+            this.temperatureInCelsius = temperatureInCelsius;
         }
 
         public WeatherConditionEntity getWeatherCondition() {

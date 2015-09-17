@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.client.resources.weather;
 
 import fr.cvlaminck.hwweather.client.resources.weather.enums.TemperatureUnit;
 
-public class CurrentWeatherResource
+public class HourlyForecastResource
     extends AbstractWeatherResource {
     private double temperatureInCelsius;
 

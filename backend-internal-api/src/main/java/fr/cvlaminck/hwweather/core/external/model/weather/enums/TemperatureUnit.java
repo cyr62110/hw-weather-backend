@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.core.external.model.weather.enums;
 
 public enum TemperatureUnit {
     CELSIUS(1d, 0d),
-    KELVIN(1d, 273.15),
+    KELVIN(1d, 273.15d),
     FAHRENHEIT(1 / 1.8d, -32d);
 
     private double conversionFactorToCelsius;

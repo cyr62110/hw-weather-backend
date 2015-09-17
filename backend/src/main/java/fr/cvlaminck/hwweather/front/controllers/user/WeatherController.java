@@ -1,6 +1,6 @@
 package fr.cvlaminck.hwweather.front.controllers.user;
 
-import fr.cvlaminck.hwweather.client.resources.weather.WeatherDataTypeResource;
+import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
 import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
@@ -8,9 +8,7 @@ import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshQueuesManager;
 import fr.cvlaminck.hwweather.core.model.WeatherData;
-import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
-import fr.cvlaminck.hwweather.data.model.weather.CurrentWeatherEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,27 +30,27 @@ public class WeatherController {
     private WeatherRefreshQueuesManager weatherRefreshQueuesManager;
 
     @RequestMapping(method = RequestMethod.GET)
-    public WeatherData get(@PathVariable String cityId, @RequestParam(required = false) Collection<WeatherDataTypeResource> type) throws NoResultForWeatherRefreshOperationException, CityDataProviderException, NoProviderWithNameException {
+    public WeatherData get(@PathVariable String cityId, @RequestParam(required = false) Collection<WeatherDataType> type) throws NoResultForWeatherRefreshOperationException, CityDataProviderException, NoProviderWithNameException {
         //TODO if type is null or empty
-        Collection<WeatherDataType> types = convertToCoreTypes(type);
+        Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types = convertToCoreTypes(type);
         return getWeather(cityId, types);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/current")
     public WeatherData getCurrent(@PathVariable String cityId) throws CityDataProviderException, NoProviderWithNameException, NoResultForWeatherRefreshOperationException {
-        return getWeather(cityId, Arrays.asList(WeatherDataType.WEATHER));
+        return getWeather(cityId, Arrays.asList(fr.cvlaminck.hwweather.data.model.WeatherDataType.WEATHER));
     }
 
-    private Collection<WeatherDataType> convertToCoreTypes(Collection<WeatherDataTypeResource> types) {
+    private Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> convertToCoreTypes(Collection<WeatherDataType> types) {
         return types.stream()
                 .map(t -> {
                     switch (t) {
                         case CURRENT:
-                            return WeatherDataType.WEATHER;
+                            return fr.cvlaminck.hwweather.data.model.WeatherDataType.WEATHER;
                         case HOURLY:
-                            return WeatherDataType.HOURLY_FORECAST;
+                            return fr.cvlaminck.hwweather.data.model.WeatherDataType.HOURLY_FORECAST;
                         case DAILY:
-                            return WeatherDataType.DAILY_FORECAST;
+                            return fr.cvlaminck.hwweather.data.model.WeatherDataType.DAILY_FORECAST;
                     }
                     return null;
                 })
@@ -60,7 +58,7 @@ public class WeatherController {
                 .collect(Collectors.toList());
     }
 
-    private WeatherData getWeather(String cityId, Collection<WeatherDataType> types) throws CityDataProviderException, NoProviderWithNameException, NoResultForWeatherRefreshOperationException {
+    private WeatherData getWeather(String cityId, Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types) throws CityDataProviderException, NoProviderWithNameException, NoResultForWeatherRefreshOperationException {
         CityEntity city = cityManager.getCity(cityId, "en-US"); //TODO handle language
         WeatherData data = weatherManager.getWeather(city, types);
         //TODO transform into response

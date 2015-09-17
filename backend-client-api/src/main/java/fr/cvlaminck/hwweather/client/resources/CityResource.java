@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.client.resources;
 
 public class CityResource {
     private String id;
-    private String externalId;
+    private ExternalCityIdResource externalId;
     private String name;
     private String country;
 
@@ -14,11 +14,11 @@ public class CityResource {
         this.id = id;
     }
 
-    public String getExternalId() {
+    public ExternalCityIdResource getExternalId() {
         return externalId;
     }
 
-    public void setExternalId(String externalId) {
+    public void setExternalId(ExternalCityIdResource externalId) {
         this.externalId = externalId;
     }
 

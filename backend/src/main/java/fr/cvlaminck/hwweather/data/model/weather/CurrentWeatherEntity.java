@@ -1,13 +1,11 @@
 package fr.cvlaminck.hwweather.data.model.weather;
 
-import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Document(collection = "current")
 public class CurrentWeatherEntity
@@ -22,7 +20,7 @@ public class CurrentWeatherEntity
     @Indexed(expireAfterSeconds = 36 * 60 * 60)
     private LocalDate day;
 
-    private double temperature;
+    private double temperatureInCelsius;
 
     private WeatherConditionEntity weatherCondition;
 
@@ -62,12 +60,12 @@ public class CurrentWeatherEntity
         this.day = day;
     }
 
-    public double getTemperature() {
-        return temperature;
+    public double getTemperatureInCelsius() {
+        return temperatureInCelsius;
     }
 
-    public void setTemperature(double temperature) {
-        this.temperature = temperature;
+    public void setTemperatureInCelsius(double temperatureInCelsius) {
+        this.temperatureInCelsius = temperatureInCelsius;
     }
 
     public WeatherConditionEntity getWeatherCondition() {

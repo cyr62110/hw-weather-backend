@@ -1,6 +1,6 @@
 package fr.cvlaminck.hwweather.client.resources.weather;
 
-public abstract class AbstractWeatherResource {
+/*package*/ abstract class AbstractWeatherResource {
     private WeatherConditionResource weatherCondition;
     private long date;
 

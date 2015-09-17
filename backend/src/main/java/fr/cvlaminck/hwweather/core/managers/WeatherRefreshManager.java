@@ -139,7 +139,7 @@ public class WeatherRefreshManager {
         current.setCityId(city.getId());
         current.setDay(resource.getTime().toLocalDate());
         current.setWeatherCondition(toWeatherCondition(resource.getWeatherCondition()));
-        current.setTemperature(resource.getTemperature());
+        current.setTemperatureInCelsius(resource.getTemperature());
         return current;
     }
 
@@ -166,7 +166,7 @@ public class WeatherRefreshManager {
             HourlyForecastEntity.ByHourForecast byHour = new HourlyForecastEntity.ByHourForecast();
             byHour.setHour(resource.getHour());
             byHour.setWeatherCondition(toWeatherCondition(resource.getWeatherCondition()));
-            byHour.setTemperature(resource.getTemperature());
+            byHour.setTemperatureInCelsius(resource.getTemperature());
 
             hourly.getHourByHourForecasts().add(byHour);
         }
@@ -198,8 +198,8 @@ public class WeatherRefreshManager {
             DailyForecastEntity.ByDayForecast byDay = new DailyForecastEntity.ByDayForecast();
             byDay.setDay(resource.getDay());
             byDay.setWeatherCondition(toWeatherCondition(resource.getWeatherCondition()));
-            byDay.setMaxTemperature(resource.getMaxTemperature());
-            byDay.setMinTemperature(resource.getMinTemperature());
+            byDay.setMaxTemperatureInCelsius(resource.getMaxTemperature());
+            byDay.setMinTemperatureInCelsius(resource.getMinTemperature());
             daily.getDayByDayForecasts().add(byDay);
         }
         return dailyMap.values();

@@ -36,10 +36,8 @@ public class CityDataProviderManager {
         return dataProviders.get(0);
     }
 
-    public Collection<ExternalCityResource> searchByName(String name, Pageable pageable) throws CityDataProviderException {
-        //FIXME pageable is ignored for now
-        Collection<ExternalCityResource> cities = getActiveProvider().searchByName(name);
-        return cities;
+    public Collection<ExternalCityResource> searchByName(String name) throws CityDataProviderException {
+        return getActiveProvider().searchByName(name);
     }
 
     public ExternalCityResource findById(String providerName, String cityId) throws NoProviderWithNameException, CityDataProviderException {
