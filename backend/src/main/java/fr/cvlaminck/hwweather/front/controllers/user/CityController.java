@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
@@ -43,8 +42,8 @@ public class CityController {
         SearchCityResponse response = new SearchCityResponse();
         response.setQuery(name);
         response.setPage(page);
-        response.setNumberOfResultsPerPage(numberOfResultsPerPage);
-        response.setTotalNumberOfResults(cities.size());
+        response.setNumberOfResultPerPage(numberOfResultsPerPage);
+        response.setTotalNumberOfResult(cities.size());
         response.setResults(cities.stream()
                 .skip((page - 1) * numberOfResultsPerPage)
                 .limit(numberOfResultsPerPage)

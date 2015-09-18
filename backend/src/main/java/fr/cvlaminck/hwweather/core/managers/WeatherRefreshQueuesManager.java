@@ -3,6 +3,7 @@ package fr.cvlaminck.hwweather.core.managers;
 import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationMessage;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationResultMessage;
+import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.data.model.weather.AbstractWeatherDataEntity;
@@ -49,11 +50,12 @@ public class WeatherRefreshQueuesManager {
         return resultQueue;
     }
 
-    public void postRefreshOperationForCityAndWaitForResult(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
+    public RefreshOperationSummary postRefreshOperationForCityAndWaitForResult(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
         if (!typesToRefresh.isEmpty()) {
             postRefreshForCity(city, typesToRefresh);
-            waitUntilCityWeatherIsRefreshed(city, typesToRefresh);
+            return waitUntilCityWeatherIsRefreshed(city, typesToRefresh);
         }
+        return null;
     }
 
     /**
@@ -73,7 +75,9 @@ public class WeatherRefreshQueuesManager {
         }
     }
 
-    public void waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
+    public RefreshOperationSummary waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
+        RefreshOperationSummary summary = null;
+
         //We declare the queue for receiving weather update and bind it to the right exchange
         Queue resultQueue = getQueueForCity(city);
 
@@ -89,6 +93,14 @@ public class WeatherRefreshQueuesManager {
                 message = (WeatherRefreshOperationResultMessage) amqpTemplate.receiveAndConvert(resultQueue.getName());
                 if (message == null) {
                     Thread.sleep(timeBetweenPoll);
+                } else {
+                    summary = new RefreshOperationSummary();
+                    summary.setCity(city);
+                    summary.setTypesToRefresh(typesToRefresh);
+                    summary.setRefreshedTypes(message.getRefreshedTypes());
+                    summary.setNumberOfProviderCalled(message.getNumberOfProviderCalled());
+                    summary.setNumberOfFreeCallUsed(message.getNumberOfFreeCallUsed());
+                    summary.setOperationCost(message.getOperationCost());
                 }
             }
         } catch (InterruptedException e) {}
@@ -105,12 +117,16 @@ public class WeatherRefreshQueuesManager {
             //TODO wait for another message
             throw new NoResultForWeatherRefreshOperationException();
         }
+        return summary;
     }
 
-    public void postRefreshOperationFinishedForCity(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
+    public void postRefreshOperationFinishedForCity(CityEntity city, RefreshOperationSummary summary) {
         WeatherRefreshOperationResultMessage message = new WeatherRefreshOperationResultMessage();
         message.setCityId(city.getId());
-        message.setRefreshedTypes(typesToRefresh);
+        message.setRefreshedTypes(summary.getRefreshedTypes());
+        message.setNumberOfProviderCalled(summary.getNumberOfProviderCalled());
+        message.setNumberOfFreeCallUsed(summary.getNumberOfFreeCallUsed());
+        message.setOperationCost(summary.getOperationCost());
 
         amqpTemplate.convertAndSend(weatherRefreshOperationResultExchange.getName(),
                 city.getId(),

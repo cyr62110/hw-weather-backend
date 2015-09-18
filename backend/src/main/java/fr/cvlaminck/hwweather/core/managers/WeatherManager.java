@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
+import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
 import fr.cvlaminck.hwweather.core.model.WeatherData;
 import fr.cvlaminck.hwweather.core.utils.DateUtils;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
@@ -45,13 +46,26 @@ public class WeatherManager {
 
         if (refreshIfNecessary) {
             Collection<WeatherDataType> typesToRefresh = data.getMissingOrInGracePeriodTypes();
-            boolean waitForResult = !data.getMissingTypes().isEmpty();
-            if (waitForResult) {
-                weatherRefreshQueuesManager.postRefreshOperationForCityAndWaitForResult(city, typesToRefresh);
-                //Once every type has been refreshed, we retrieve the data for those types from the database once again.
-                fillWeatherDataWithTypesUsingDatabase(data, typesToRefresh);
-            } else {
-                weatherRefreshQueuesManager.postRefreshForCity(city, typesToRefresh);
+            if (!typesToRefresh.isEmpty()) {
+                boolean waitForResult = !data.getMissingTypes().isEmpty();
+
+                data.getMetadata().setTypesToRefresh(typesToRefresh);
+                data.getMetadata().setHasCausedRefreshOperation(true);
+                data.getMetadata().setHasWaitedForRefreshOperationToFinish(waitForResult);
+
+                if (waitForResult) {
+                    RefreshOperationSummary summary = weatherRefreshQueuesManager.postRefreshOperationForCityAndWaitForResult(city, typesToRefresh);
+
+                    data.getMetadata().setRefreshedTypes(summary.getRefreshedTypes());
+                    data.getMetadata().setNumberOfProviderCalled(summary.getNumberOfProviderCalled());
+                    data.getMetadata().setNumberOfFreeCallUsed(summary.getNumberOfFreeCallUsed());
+                    data.getMetadata().setOperationCost(summary.getOperationCost());
+
+                    //Once every type has been refreshed, we retrieve the data for those types from the database once again.
+                    fillWeatherDataWithTypesUsingDatabase(data, typesToRefresh);
+                } else {
+                    weatherRefreshQueuesManager.postRefreshForCity(city, typesToRefresh);
+                }
             }
         }
 

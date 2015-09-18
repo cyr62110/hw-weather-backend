@@ -4,6 +4,7 @@ import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOpera
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
+import fr.cvlaminck.hwweather.core.model.WeatherProvidersSelectionResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,12 @@ public class WeatherDataProviderManager {
         Set<ExternalWeatherDataType> typesToRefreshLeft = new HashSet<>();
         typesToRefreshLeft.addAll(typesToRefresh);
 
-        for (WeatherDataProvider provider: getBestProvidersForRefreshOperation(typesToRefresh)) {
+        WeatherProvidersSelectionResult result = weatherDataProviderSelectionManager.selectDataProvidersToUseForRefreshOperation(typesToRefresh);
+        data.getMetadata().setNumberOfProviderCalled(result.getProvidersToUse().size());
+        data.getMetadata().setNumberOfFreeCallUsed(result.getNumberOfFreeCallUsed());
+        data.getMetadata().setOperationCost(result.getOperationCost());
+
+        for (WeatherDataProvider provider: result.getProvidersToUse()) {
             //We use the next provider in the list to get data.
             ExternalWeatherData response = provider.refresh(latitude, longitude, typesToRefreshLeft);
             //We merge the data with the one provided by the other providers preceding this one
@@ -34,10 +40,6 @@ public class WeatherDataProviderManager {
             typesToRefreshLeft = removeResolvedTypeFromTypesToRefresh(typesToRefreshLeft, data);
         }
         return data;
-    }
-
-    private Collection<WeatherDataProvider> getBestProvidersForRefreshOperation(Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
-        return weatherDataProviderSelectionManager.selectDataProvidersToUseForRefreshOperation(typesToRefresh);
     }
 
     /**

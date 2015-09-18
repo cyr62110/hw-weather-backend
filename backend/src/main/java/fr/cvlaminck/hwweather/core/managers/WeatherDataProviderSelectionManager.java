@@ -4,6 +4,7 @@ import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOpera
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
 import fr.cvlaminck.hwweather.core.model.RefreshPlan;
+import fr.cvlaminck.hwweather.core.model.WeatherProvidersSelectionResult;
 import fr.cvlaminck.hwweather.core.utils.iterators.KSubsetOfNSetIterator;
 import fr.cvlaminck.hwweather.core.utils.iterators.PartitionOfSetIterator;
 import fr.cvlaminck.hwweather.data.model.FreeCallCountersEntity;
@@ -55,13 +56,14 @@ public class WeatherDataProviderSelectionManager {
         return providersByRefreshTypeMap;
     }
 
-    public List<WeatherDataProvider> selectDataProvidersToUseForRefreshOperation(Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+    public WeatherProvidersSelectionResult selectDataProvidersToUseForRefreshOperation(Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
         //We build all possible refresh plan for the types we want to refresh
         Set<RefreshPlan> refreshPlans = getOrBuildRefreshPlans(typesToRefresh, providersByRefreshTypeMap);
         RefreshPlan refreshPlan = null;
 
+        FreeCallCountersEntity freeCallCounters = null;
         while (refreshPlan == null) {
-            FreeCallCountersEntity freeCallCounters = freeCallCountersRepository.findFreeCallsLeftForToday();
+            freeCallCounters = freeCallCountersRepository.findFreeCallsLeftForToday();
 
             //Then, we select the best plan
             Optional<RefreshPlan> bestRefreshPlan = findBestRefreshPlan(refreshPlans, freeCallCounters);
@@ -81,7 +83,12 @@ public class WeatherDataProviderSelectionManager {
                 }
             }
         }
-        return refreshPlan.getProvidersToUse().stream().collect(Collectors.toList());
+
+        WeatherProvidersSelectionResult result = new WeatherProvidersSelectionResult();
+        result.setProvidersToUse(refreshPlan.getProvidersToUse().stream().collect(Collectors.toList()));
+        result.setNumberOfFreeCallUsed(refreshPlan.getFreeCalls(freeCallCounters).size());
+        result.setOperationCost(refreshPlan.getCost(freeCallCounters));
+        return result;
     }
 
     private Set<RefreshPlan> getOrBuildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh, Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap) {

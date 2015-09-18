@@ -7,6 +7,8 @@ public class ExternalWeatherData {
     private Collection<ExternalDailyForecastResource> daily = null;
     private Collection<ExternalHourlyForecastResource> hourly = null;
 
+    private Metadata metadata = new Metadata();
+
     public boolean contains(ExternalWeatherDataType type) {
         switch (type) {
             case CURRENT:
@@ -41,5 +43,39 @@ public class ExternalWeatherData {
 
     public void setHourly(Collection<ExternalHourlyForecastResource> hourly) {
         this.hourly = hourly;
+    }
+
+    public Metadata getMetadata() {
+        return metadata;
+    }
+
+    public static class Metadata {
+        private int numberOfProviderCalled = 0;
+        private int numberOfFreeCallUsed = 0;
+        private double operationCost = 0d;
+
+        public int getNumberOfProviderCalled() {
+            return numberOfProviderCalled;
+        }
+
+        public void setNumberOfProviderCalled(int numberOfProviderCalled) {
+            this.numberOfProviderCalled = numberOfProviderCalled;
+        }
+
+        public int getNumberOfFreeCallUsed() {
+            return numberOfFreeCallUsed;
+        }
+
+        public void setNumberOfFreeCallUsed(int numberOfFreeCallUsed) {
+            this.numberOfFreeCallUsed = numberOfFreeCallUsed;
+        }
+
+        public double getOperationCost() {
+            return operationCost;
+        }
+
+        public void setOperationCost(double operationCost) {
+            this.operationCost = operationCost;
+        }
     }
 }

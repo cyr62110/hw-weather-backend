@@ -7,13 +7,13 @@ public class PageResponse<T> {
     private String query;
     private Collection<T> results = Collections.emptyList();
 
-    private int totalNumberOfResults;
+    private int totalNumberOfResult;
 
     private int page;
-    private int numberOfResultsPerPage;
+    private int numberOfResultPerPage;
 
     public int getNumberOfPage() {
-        return (int) Math.ceil(((double) totalNumberOfResults) / numberOfResultsPerPage);
+        return (int) Math.ceil(((double) totalNumberOfResult) / numberOfResultPerPage);
     }
 
     public boolean hasNext() {
@@ -36,12 +36,12 @@ public class PageResponse<T> {
         this.results = results;
     }
 
-    public int getTotalNumberOfResults() {
-        return totalNumberOfResults;
+    public int getTotalNumberOfResult() {
+        return totalNumberOfResult;
     }
 
-    public void setTotalNumberOfResults(int totalNumberOfResults) {
-        this.totalNumberOfResults = totalNumberOfResults;
+    public void setTotalNumberOfResult(int totalNumberOfResult) {
+        this.totalNumberOfResult = totalNumberOfResult;
     }
 
     public int getPage() {
@@ -52,11 +52,11 @@ public class PageResponse<T> {
         this.page = page;
     }
 
-    public int getNumberOfResultsPerPage() {
-        return numberOfResultsPerPage;
+    public int getNumberOfResultPerPage() {
+        return numberOfResultPerPage;
     }
 
-    public void setNumberOfResultsPerPage(int numberOfResultsPerPage) {
-        this.numberOfResultsPerPage = numberOfResultsPerPage;
+    public void setNumberOfResultPerPage(int numberOfResultPerPage) {
+        this.numberOfResultPerPage = numberOfResultPerPage;
     }
 }

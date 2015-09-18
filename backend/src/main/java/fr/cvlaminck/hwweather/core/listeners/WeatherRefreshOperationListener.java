@@ -4,6 +4,7 @@ import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOpera
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshQueuesManager;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationMessage;
+import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.data.repositories.CityRepository;
@@ -44,13 +45,13 @@ public class WeatherRefreshOperationListener
     private void onWeatherRefreshOperationReceived(WeatherRefreshOperationMessage message) {
         log.info("Weather refresh operation received for city '{}'. Types to refresh: {}", message.getCityId(), message.getTypesToRefresh());
         CityEntity city = cityRepository.findOne(message.getCityId());
-        Collection<WeatherDataType> refreshedTypes = Collections.emptyList();
         try {
-             refreshedTypes = weatherRefreshManager.refresh(city, message.getTypesToRefresh());
+            RefreshOperationSummary summary = weatherRefreshManager.refresh(city, message.getTypesToRefresh());
+
+            log.info("Weather refresh operation finished for city '{}'. Refreshed types: {}", message.getCityId(), summary.getRefreshedTypes());
+            weatherRefreshQueuesManager.postRefreshOperationFinishedForCity(city, summary);
         } catch (NoProviderAvailableForRefreshOperationException e) {
             e.printStackTrace(); //TODO Better handling of the error.
         }
-        log.info("Weather refresh operation finished for city '{}'. Refreshed types: {}", message.getCityId(), refreshedTypes);
-        weatherRefreshQueuesManager.postRefreshOperationFinishedForCity(city, refreshedTypes);
     }
 }

@@ -2,6 +2,7 @@ package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.model.weather.*;
+import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
 import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
@@ -35,13 +36,20 @@ public class WeatherRefreshManager {
     @Autowired
     private HourlyForecastRepository hourlyForecastRepository;
 
-    public Collection<WeatherDataType> refresh(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+    public RefreshOperationSummary refresh(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+        RefreshOperationSummary summary = new RefreshOperationSummary();
+        summary.setCity(city);
+        summary.setTypesToRefresh(typesToRefresh);
+
         List<WeatherDataType> refreshedTypes = new ArrayList<>();
         typesToRefresh = filterAlreadyRefreshedType(city, typesToRefresh);
         if (typesToRefresh.isEmpty()) {
-            return refreshedTypes;
+            return summary;
         }
         ExternalWeatherData data = weatherDataProviderManager.refresh(city.getLatitude(), city.getLongitude(), getExternalWeatherDataTypesToRefresh(typesToRefresh));
+        summary.setNumberOfProviderCalled(data.getMetadata().getNumberOfProviderCalled());
+        summary.setNumberOfFreeCallUsed(data.getMetadata().getNumberOfFreeCallUsed());
+        summary.setOperationCost(data.getMetadata().getOperationCost());
 
         CurrentWeatherEntity current = getCurrentWeatherFromData(city, data);
         if (current != null) {
@@ -74,7 +82,9 @@ public class WeatherRefreshManager {
                 dailyForecastRepository.save(daily);
             }
         }
-        return refreshedTypes;
+
+        summary.setRefreshedTypes(refreshedTypes);
+        return summary;
     }
 
     private Collection<WeatherDataType> filterAlreadyRefreshedType(CityEntity city, Collection<WeatherDataType> typesToRefresh) {
