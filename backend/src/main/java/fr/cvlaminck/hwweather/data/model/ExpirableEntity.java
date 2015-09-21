@@ -1,10 +1,8 @@
 package fr.cvlaminck.hwweather.data.model;
 
-import com.sun.scenario.effect.Offset;
-import org.springframework.data.mongodb.core.index.Indexed;
+import fr.cvlaminck.hwweather.core.utils.DateUtils;
 
 import java.time.*;
-import java.util.Date;
 
 public abstract class ExpirableEntity {
 
@@ -21,7 +19,7 @@ public abstract class ExpirableEntity {
     }
 
     protected ExpirableEntity(int expiryInSeconds, int gracePeriodInSeconds) {
-        this.refreshTime = LocalDateTime.now(ZoneId.of("UTC"));
+        this.refreshTime = DateUtils.now();
         this.gracePeriodInSeconds = gracePeriodInSeconds;
         this.expiryInSeconds = expiryInSeconds;
     }
@@ -34,24 +32,25 @@ public abstract class ExpirableEntity {
     }
 
     public boolean isExpired() {
-        return getExpiryDate().isBefore(OffsetDateTime.now(ZoneId.of("UTC")));
+        return getExpiryDate().isBefore(DateUtils.now());
     }
 
     public boolean isExpiredOrInGracePeriod() {
-        return getGracePeriodStartTime().isBefore(OffsetDateTime.now(ZoneId.of("UTC")));
+        return getGracePeriodStartDate().isBefore(DateUtils.now());
     }
 
-    public OffsetDateTime getRefreshTime() {
-        return refreshTime.atOffset(ZoneOffset.UTC);
+    public LocalDateTime getRefreshTime() {
+        return refreshTime;
     }
 
-    public OffsetDateTime getGracePeriodStartTime() {
-        return getExpiryDate()
-                .minusSeconds(gracePeriodInSeconds);
-    }
-
-    public OffsetDateTime getExpiryDate() {
+    public LocalDateTime getGracePeriodStartDate() {
         return getRefreshTime()
                 .plusSeconds(expiryInSeconds);
+    }
+
+    public LocalDateTime getExpiryDate() {
+        return getRefreshTime()
+                .plusSeconds(expiryInSeconds)
+                .plusSeconds(gracePeriodInSeconds);
     }
 }
