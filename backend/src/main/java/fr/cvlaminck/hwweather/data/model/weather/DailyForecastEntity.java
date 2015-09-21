@@ -19,7 +19,7 @@ public class DailyForecastEntity
     @Indexed
     private String cityId;
 
-    @Indexed(expireAfterSeconds = (int) (7.5 * 24 * 60 * 60))
+    @Indexed
     private LocalDate week;
 
     private Collection<ByDayForecast> dayByDayForecasts = new ArrayList<>();

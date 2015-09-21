@@ -20,7 +20,7 @@ public class HourlyForecastEntity
     @Indexed
     private String cityId;
 
-    @Indexed(expireAfterSeconds = 25 * 60 * 60)
+    @Indexed
     private LocalDate day;
 
     public HourlyForecastEntity() {

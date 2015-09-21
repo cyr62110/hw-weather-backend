@@ -17,7 +17,7 @@ public class CurrentWeatherEntity
     @Indexed
     private String cityId;
 
-    @Indexed(expireAfterSeconds = 36 * 60 * 60)
+    @Indexed
     private LocalDate day;
 
     private double temperatureInCelsius;
