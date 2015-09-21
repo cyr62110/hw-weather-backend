@@ -62,7 +62,7 @@ public class WeatherDataProviderSelectionManager {
         RefreshPlan refreshPlan = null;
 
         FreeCallCountersEntity freeCallCounters = null;
-        while (refreshPlan == null) {
+        while (refreshPlan == null) { //TODO: Add a maximal number of iteration to find a result in configuration
             freeCallCounters = freeCallCountersRepository.findFreeCallsLeftForToday();
 
             //Then, we select the best plan
@@ -75,10 +75,10 @@ public class WeatherDataProviderSelectionManager {
             //We try to reserve the free calls for providers
             Collection<String> freeCallsRequiredForRefreshPlan = bestRefreshPlan.get().getFreeCalls(freeCallCounters);
             if (!freeCallsRequiredForRefreshPlan.isEmpty()) {
-                freeCallCounters = freeCallCountersRepository.decrement(freeCallsRequiredForRefreshPlan);
+                FreeCallCountersEntity decrementedCounters = freeCallCountersRepository.decrement(freeCallsRequiredForRefreshPlan);
                 //If free calls are exhausted for some provider, we loop again
                 //Counters will be refreshed and we will try to find a new best.
-                if (freeCallCounters == null) {
+                if (decrementedCounters == null) {
                     refreshPlan = null;
                 }
             }

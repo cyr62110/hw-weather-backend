@@ -17,7 +17,7 @@ public class WeatherDataConverter {
 
     public CurrentWeatherResource getResourceFrom(CurrentWeatherEntity entity) {
         CurrentWeatherResource resource = new CurrentWeatherResource();
-        resource.setDate(entity.getRefreshTime().toInstant().toEpochMilli());
+        resource.setDate(entity.getRefreshTime().toInstant(ZoneOffset.UTC).toEpochMilli());
         resource.setTemperatureInCelsius(entity.getTemperatureInCelsius());
         resource.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
         return resource;
