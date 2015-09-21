@@ -32,9 +32,9 @@ public class WeatherData {
                         case WEATHER:
                             return current == null;
                         case HOURLY_FORECAST:
-                            return !hourlyList.isEmpty();
+                            return hourlyList.isEmpty();
                         case DAILY_FORECAST:
-                            return !dailyList.isEmpty();
+                            return dailyList.isEmpty();
                     }
                     return false;
                 })
@@ -48,9 +48,9 @@ public class WeatherData {
                         case WEATHER:
                             return current == null || current.isInGracePeriod();
                         case HOURLY_FORECAST:
-                            return !hourlyList.isEmpty() || hourlyList.stream().anyMatch(ExpirableEntity::isInGracePeriod);
+                            return hourlyList.isEmpty() || hourlyList.stream().anyMatch(ExpirableEntity::isInGracePeriod);
                         case DAILY_FORECAST:
-                            return !dailyList.isEmpty() || dailyList.stream().anyMatch(ExpirableEntity::isInGracePeriod);
+                            return dailyList.isEmpty() || dailyList.stream().anyMatch(ExpirableEntity::isInGracePeriod);
                     }
                     return false;
                 })
