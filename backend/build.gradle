@@ -21,6 +21,8 @@ dependencies {
 
     compile 'org.springframework.data:spring-data-mongodb:1.7.2.RELEASE'
 
+    compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
+
     compile 'io.reactivex:rxjava:1.0.14'
 
     compile project(':backend-internal-api')
