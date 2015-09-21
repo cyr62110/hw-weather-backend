@@ -4,6 +4,7 @@ import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataTyp
 import fr.cvlaminck.hwweather.core.external.providers.weather.AbstractWeatherDataProvider;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
 import fr.cvlaminck.hwweather.core.model.RefreshPlan;
+import fr.cvlaminck.hwweather.core.model.WeatherProvidersSelectionResult;
 import fr.cvlaminck.hwweather.core.utils.iterators.PartitionOfSetIteratorTest;
 import fr.cvlaminck.hwweather.data.model.FreeCallCountersEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
@@ -189,11 +190,12 @@ public class WeatherDataProviderSelectionManagerTest {
 
         FreeCallCountersRepository repository = mock(FreeCallCountersRepository.class);
         when(repository.findFreeCallsLeftForToday()).thenReturn(freeCallsCounters);
-        when(repository.decrement(Arrays.asList("CHD"))).thenReturn(new FreeCallCountersEntity());
+        when(repository.decrement(Arrays.asList("CHD"))).thenReturn(freeCallsCounters);
 
         manager.setFreeCallCountersRepository(repository);
         manager.setWeatherDataProviders(testProviders);
 
-        assertEquals(Arrays.asList(CHD), manager.selectDataProvidersToUseForRefreshOperation(typeSet(ExternalWeatherDataType.values())));
+        WeatherProvidersSelectionResult result = manager.selectDataProvidersToUseForRefreshOperation(typeSet(ExternalWeatherDataType.values()));
+        assertEquals(Arrays.asList(CHD), result.getProvidersToUse());
     }
 }
