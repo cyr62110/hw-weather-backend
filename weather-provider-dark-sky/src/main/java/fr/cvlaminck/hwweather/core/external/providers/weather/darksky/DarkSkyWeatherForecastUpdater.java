@@ -83,12 +83,12 @@ public class DarkSkyWeatherForecastUpdater {
     }
 
     private LocalDate getNormalizedDate(DarkSkyData data) {
-        Instant instant = Instant.ofEpochMilli(data.getTime());
+        Instant instant = Instant.ofEpochMilli(data.getTime() * 1000l);
         return instant.atZone(ZoneId.of("UTC")).toLocalDate();
     }
 
     private LocalDateTime getNormalizedDateTime(DarkSkyData data) {
-        Instant instant = Instant.ofEpochMilli(data.getTime());
+        Instant instant = Instant.ofEpochMilli(data.getTime() * 1000l);
         return instant.atZone(ZoneId.of("UTC")).toLocalDateTime();
     }
 
@@ -98,6 +98,6 @@ public class DarkSkyWeatherForecastUpdater {
     }
 
     private String getApiKey() {
-        return "2c0adcb3fa33fe9084bb29cfce5532e2"; //FIXME Remove before pushing to GitHub
+        return "31bc40bc737612697c579145c96591e5"; //FIXME Remove before pushing to GitHub
     }
 }
