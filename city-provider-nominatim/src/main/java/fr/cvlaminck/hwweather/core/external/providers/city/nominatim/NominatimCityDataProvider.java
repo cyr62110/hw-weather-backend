@@ -36,9 +36,9 @@ public class NominatimCityDataProvider
                     .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
                     .get();
         } catch (IOException e) {
-            throw new CityDataProviderException(this.getClass(), "Error while communicating with API", e);
+            throw new CityDataProviderException(this, "Error while communicating with API", e);
         } catch (NominatimAPIException e) {
-            throw new CityDataProviderException(this.getClass(), "Error in result format", e);
+            throw new CityDataProviderException(this, "Error in result format", e);
         }
 
         return results.stream()
@@ -56,11 +56,11 @@ public class NominatimCityDataProvider
                 .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
                 .get();
         } catch (IOException e) {
-            throw new CityDataProviderException(this.getClass(), "Error while communicating with API", e);
+            throw new CityDataProviderException(this, "Error while communicating with API", e);
         } catch (NominatimAPIException e) {
-            throw new CityDataProviderException(this.getClass(), "Error in result format", e);
+            throw new CityDataProviderException(this, "Error in result format", e);
         } catch (NumberFormatException e) {
-            throw new CityDataProviderException(this.getClass(), "Id format is not supported by this provider", e);
+            throw new CityDataProviderException(this, "Id format is not supported by this provider", e);
         }
         return results.stream()
                 .map((p) -> convertPlaceToResource(p))

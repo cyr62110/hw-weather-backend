@@ -1,6 +1,8 @@
 package fr.cvlaminck.hwweather.core.managers;
 
+import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
+import fr.cvlaminck.hwweather.core.exceptions.clients.CityNotFoundException;
 import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
@@ -18,14 +20,23 @@ public class CityManager {
     @Autowired
     private CityDataProviderManager cityDataProviderManager;
 
-    public CityEntity getCity(String id, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
+    public CityEntity getCity(String id, String languageCode) throws CityNotFoundException, DataProviderException {
         CityEntity city = null;
-        if (CityExternalIdEntity.isExternalId(id)) {
-            city = getOrImportCityWithExternalId(CityExternalIdEntity.parse(id), languageCode);
-        } else {
-            city = cityRepository.findOne(id);
+        try {
+            if (CityExternalIdEntity.isExternalId(id)) {
+                city = getOrImportCityWithExternalId(CityExternalIdEntity.parse(id), languageCode);
+            } else {
+                city = cityRepository.findOne(id);
+            }
+            city = refreshCityIfMissingI18NName(city, languageCode);
+        } catch (CityDataProviderException e) {
+            throw new DataProviderException(e.getDataProvider(), e);
+        } catch (NoProviderWithNameException e) {
         }
-        return refreshCityIfMissingI18NName(city, languageCode);
+        if (city == null) {
+            throw new CityNotFoundException(id);
+        }
+        return city;
     }
 
     public CityEntity updateOrAddCityWithExternalId(String externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {

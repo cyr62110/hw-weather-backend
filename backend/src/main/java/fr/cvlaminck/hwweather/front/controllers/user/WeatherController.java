@@ -2,8 +2,10 @@ package fr.cvlaminck.hwweather.front.controllers.user;
 
 import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
+import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
 import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
+import fr.cvlaminck.hwweather.core.exceptions.clients.CityNotFoundException;
 import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherManager;
@@ -43,7 +45,7 @@ public class WeatherController {
     public WeatherResponse get(@PathVariable String cityId,
                                @RequestParam(required = false) Collection<WeatherDataType> type,
                                HttpServletResponse response)
-            throws NoResultForWeatherRefreshOperationException, CityDataProviderException, NoProviderWithNameException {
+            throws CityNotFoundException, DataProviderException, NoResultForWeatherRefreshOperationException, NoProviderWithNameException {
         //TODO if type is null or empty
         Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types = convertToCoreTypes(type);
         return getWeather(cityId, types, response);
@@ -52,7 +54,7 @@ public class WeatherController {
     @RequestMapping(method = RequestMethod.GET, value = "/current")
     public WeatherResponse getCurrent(@PathVariable String cityId,
                                       HttpServletResponse response)
-            throws CityDataProviderException, NoProviderWithNameException, NoResultForWeatherRefreshOperationException {
+            throws CityNotFoundException, DataProviderException, NoResultForWeatherRefreshOperationException, NoProviderWithNameException {
         Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types = Arrays.asList(fr.cvlaminck.hwweather.data.model.WeatherDataType.WEATHER);
         return getWeather(cityId, types, response);
     }
@@ -77,7 +79,7 @@ public class WeatherController {
     private WeatherResponse getWeather(String cityId,
                                        Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types,
                                        HttpServletResponse response)
-            throws CityDataProviderException, NoProviderWithNameException, NoResultForWeatherRefreshOperationException {
+            throws CityNotFoundException, NoResultForWeatherRefreshOperationException, DataProviderException, NoProviderWithNameException {
         CityEntity city = cityManager.getCity(cityId, "en-US"); //TODO handle language
         WeatherData data = weatherManager.getWeather(city, types);
 

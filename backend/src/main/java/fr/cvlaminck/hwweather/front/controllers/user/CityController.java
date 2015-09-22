@@ -1,6 +1,8 @@
 package fr.cvlaminck.hwweather.front.controllers.user;
 
 import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
+import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
+import fr.cvlaminck.hwweather.core.managers.CityDataProviderManager;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.front.converters.CityConverter;
@@ -12,9 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-
-import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
-import fr.cvlaminck.hwweather.core.managers.CityDataProviderManager;
 
 @RestController
 @RequestMapping("/cities")
@@ -31,7 +30,7 @@ public class CityController {
 
     @RequestMapping("/search/{name}")
     public SearchCityResponse search(@PathVariable String name,
-                                                   @RequestParam(required = false) Integer page) throws Exception {
+                                     @RequestParam(required = false) Integer page) throws Exception {
         if (page == null || page < 1) {
             page = 1;
         }
@@ -45,10 +44,10 @@ public class CityController {
         response.setNumberOfResultPerPage(numberOfResultsPerPage);
         response.setTotalNumberOfResult(cities.size());
         response.setResults(cities.stream()
-                .skip((page - 1) * numberOfResultsPerPage)
-                .limit(numberOfResultsPerPage)
-                .map(c -> cityConverter.getResourceFrom(c))
-                .collect(Collectors.toList())
+                        .skip((page - 1) * numberOfResultsPerPage)
+                        .limit(numberOfResultsPerPage)
+                        .map(c -> cityConverter.getResourceFrom(c))
+                        .collect(Collectors.toList())
         );
         return response;
     }

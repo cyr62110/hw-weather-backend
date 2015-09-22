@@ -31,7 +31,7 @@ public class WeatherDataConverter {
         return resource;
     }
 
-    public DailyForecastResource getResourceFrom(DailyForecastEntity.ByDayForecast entity)  {
+    public DailyForecastResource getResourceFrom(DailyForecastEntity.ByDayForecast entity) {
         DailyForecastResource resource = new DailyForecastResource();
         resource.setDate(entity.getDay().atTime(0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
         resource.setMinTemperatureInCelsius(entity.getMinTemperatureInCelsius());
