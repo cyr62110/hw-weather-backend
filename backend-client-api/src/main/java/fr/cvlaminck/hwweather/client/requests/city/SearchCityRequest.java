@@ -10,7 +10,7 @@ public class SearchCityRequest
 
     private String city;
 
-    protected SearchCityRequest(Uri baseUri, ObjectMapper mapper) {
+    public SearchCityRequest(Uri baseUri, ObjectMapper mapper) {
         super(baseUri, mapper, SearchCityResponse.class);
     }
 

@@ -24,7 +24,7 @@ public abstract class HwWeatherRequest<T> {
 
     private ObjectMapper objectMapper;
 
-    protected HwWeatherRequest(Uri baseUri, ObjectMapper mapper, Class<T> responseClass) {
+    protected HwWeatherRequest(Uri baseUri, ObjectMapper objectMapper, Class<T> responseClass) {
         this.baseUri = baseUri;
         this.objectMapper = objectMapper;
         this.responseClass = responseClass;
