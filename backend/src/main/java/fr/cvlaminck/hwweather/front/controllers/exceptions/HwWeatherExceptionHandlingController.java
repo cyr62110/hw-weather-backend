@@ -23,7 +23,7 @@ public class HwWeatherExceptionHandlingController {
         httpResponse.setStatus(ex.getResponseCode());
 
         ClientErrorResponse response = new ClientErrorResponse();
-        response.setStatusCode(ex.getResponseCode());
+        response.setStatus(ex.getResponseCode());
         response.setMessage(ex.getMessage());
         return response;
     }

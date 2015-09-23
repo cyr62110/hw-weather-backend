@@ -4,6 +4,11 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
 import fr.cvlaminck.builders.uri.UriBuilder;
+import fr.cvlaminck.hwweather.client.exceptions.HwWeatherClientException;
+import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
+import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
+import fr.cvlaminck.hwweather.client.exceptions.HwWeatherServerException;
+import fr.cvlaminck.hwweather.client.reponses.ClientErrorResponse;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -15,8 +20,10 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
-public abstract class HwWeatherRequest<T> {
+public abstract class HwWeatherRequest<T>
+    implements Callable<T> {
 
     private Uri baseUri;
     private Class<T> responseClass;
@@ -36,7 +43,8 @@ public abstract class HwWeatherRequest<T> {
 
     public abstract Uri build();
 
-    public T execute() throws IOException {
+    @Override
+    public T call() throws HwWeatherRequestException, IOException {
         T response = null;
         HttpURLConnection urlConnection = null;
         try {
@@ -45,6 +53,13 @@ public abstract class HwWeatherRequest<T> {
                 urlConnection = (HttpURLConnection) url.openConnection();
             } else {
                 urlConnection = (HttpURLConnection) url.openConnection(proxy);
+            }
+
+            urlConnection.setRequestMethod(getRequestMethod());
+            String requestContent = getRequestContent();
+            if (requestContent != null && !requestContent.isEmpty()) {
+                urlConnection.setDoOutput(true);
+                IOUtils.write(requestContent, urlConnection.getOutputStream());
             }
 
             int responseCode = urlConnection.getResponseCode();
@@ -61,22 +76,28 @@ public abstract class HwWeatherRequest<T> {
                         //TODO
                         break;
                     case 4:
-                        handleClientError(responseCode, responseContent, responseHeaders);
+                        handleClientError(url, requestContent, responseCode, responseContent, responseHeaders);
                         break;
                     case 5:
-                        handleServerError(responseCode, responseContent, responseHeaders);
+                        handleServerError(url, requestContent, responseCode, responseContent, responseHeaders);
                         break;
                 }
             }
 
-        } catch (MalformedURLException e) {
-            //Silent since the UriBuilder ensure the validity of the URL.
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
         }
         return response;
+    }
+
+    protected String getRequestMethod() {
+        return "GET";
+    }
+
+    protected String getRequestContent() throws HwWeatherIllegalProtocolException {
+        return null;
     }
 
     private String getResponseContent(HttpURLConnection urlConnection, int responseCode, Map<String, List<String>> responseHeaders) throws IOException {
@@ -90,12 +111,20 @@ public abstract class HwWeatherRequest<T> {
         }
     }
 
-    protected void handleServerError(int responseCode, String responseContent, Map<String, List<String>> responseHeaders) {
-
+    protected void handleServerError(URL requestUrl, String requestContent,
+                                     int responseCode, String responseContent, Map<String, List<String>> responseHeaders)
+        throws HwWeatherServerException {
+        throw new HwWeatherServerException(requestUrl, requestContent, responseCode);
     }
 
-    protected void handleClientError(int responseCode, String responseContent, Map<String, List<String>> responseHeaders) {
-
+    protected void handleClientError(URL requestUrl, String requestContent,
+                                     int responseCode, String responseContent, Map<String, List<String>> responseHeaders)
+            throws HwWeatherClientException, IOException {
+        if (responseContent == null || responseContent.isEmpty()) {
+            throw new HwWeatherClientException(requestUrl, requestContent, responseCode);
+        }
+        ClientErrorResponse response = objectMapper.readValue(responseContent, ClientErrorResponse.class);
+        throw new HwWeatherClientException(requestUrl, requestContent, responseCode, response.getMessage());
     }
 
     protected T getResponse(String responseContent, Map<String, List<String>> responseHeaders) throws IOException {

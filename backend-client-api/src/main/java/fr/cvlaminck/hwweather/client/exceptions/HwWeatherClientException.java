@@ -1,12 +1,19 @@
 package fr.cvlaminck.hwweather.client.exceptions;
 
+import java.net.URL;
+
 /**
- * Thrown if the query causes the server to returns a 400 error.
+ * Thrown if the query causes the server to returns a 4xx error.
  */
 public class HwWeatherClientException
-        extends Exception {
-    private int responseCode;
+        extends HwWeatherRequestException {
+    public static final String MESSAGE = "Server responded with code '%d' to the request. ";
 
+    public HwWeatherClientException(URL requestUrl, String requestContent, int statusCode) {
+        super(String.format(MESSAGE, statusCode), requestUrl, requestContent, statusCode);
+    }
 
-
+    public HwWeatherClientException(URL requestUrl, String requestContent, int statusCode, String details) {
+        super(String.format(MESSAGE, statusCode) + details, requestUrl, requestContent, statusCode);
+    }
 }

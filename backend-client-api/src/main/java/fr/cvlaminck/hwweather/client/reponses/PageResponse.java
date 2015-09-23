@@ -12,14 +12,6 @@ public class PageResponse<T> {
     private int page;
     private int numberOfResultPerPage;
 
-    public int getNumberOfPage() {
-        return (int) Math.ceil(((double) totalNumberOfResult) / numberOfResultPerPage);
-    }
-
-    public boolean hasNext() {
-        return page < getNumberOfPage();
-    }
-
     public String getQuery() {
         return query;
     }

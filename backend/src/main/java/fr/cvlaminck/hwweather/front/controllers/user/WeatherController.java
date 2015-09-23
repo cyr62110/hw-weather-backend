@@ -14,10 +14,13 @@ import fr.cvlaminck.hwweather.core.model.WeatherData;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.front.converters.CityConverter;
 import fr.cvlaminck.hwweather.front.converters.WeatherDataConverter;
+import fr.cvlaminck.hwweather.front.exceptions.MissingTypeException;
+import fr.cvlaminck.hwweather.front.exceptions.UnknownTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -41,22 +44,30 @@ public class WeatherController {
     @Autowired
     private WeatherDataConverter weatherDataConverter;
 
-    @RequestMapping(method = RequestMethod.GET)
-    public WeatherResponse get(@PathVariable String cityId,
-                               @RequestParam(required = false) Collection<WeatherDataType> type,
-                               HttpServletResponse response)
-            throws CityNotFoundException, DataProviderException, NoResultForWeatherRefreshOperationException, NoProviderWithNameException {
-        //TODO if type is null or empty
-        Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types = convertToCoreTypes(type);
-        return getWeather(cityId, types, response);
+    //TODO Respond Forbidden on /weather, force clients to give types they want to refresh
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{sTypes}")
+    public WeatherResponse getTypes(@PathVariable String cityId,
+                                    @PathVariable String sTypes,
+                                      HttpServletResponse response)
+            throws CityNotFoundException, DataProviderException, NoResultForWeatherRefreshOperationException, NoProviderWithNameException, MissingTypeException, UnknownTypeException {
+        if (sTypes == null || sTypes.isEmpty()) {
+            throw new MissingTypeException();
+        }
+        Collection<WeatherDataType> types = getTypes(sTypes);
+        return getWeather(cityId, convertToCoreTypes(types), response);
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/current")
-    public WeatherResponse getCurrent(@PathVariable String cityId,
-                                      HttpServletResponse response)
-            throws CityNotFoundException, DataProviderException, NoResultForWeatherRefreshOperationException, NoProviderWithNameException {
-        Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types = Arrays.asList(fr.cvlaminck.hwweather.data.model.WeatherDataType.WEATHER);
-        return getWeather(cityId, types, response);
+    private Collection<WeatherDataType> getTypes(String sTypes) throws UnknownTypeException {
+        Collection<WeatherDataType> types = new ArrayList<>();
+        for (String sType : sTypes.split("\\+")) {
+            try {
+                types.add(WeatherDataType.valueOf(sType));
+            } catch (IllegalArgumentException ex) {
+                throw new UnknownTypeException(sType);
+            }
+        }
+        return types;
     }
 
     private Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> convertToCoreTypes(Collection<WeatherDataType> types) {

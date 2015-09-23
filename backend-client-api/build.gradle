@@ -8,4 +8,7 @@ dependencies {
     compile 'fr.cvlaminck:java-uri-builder:1.2'
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "commons-io:commons-io:$commonsIoVersion"
+
+    testCompile "junit:junit:$jUnitVersion"
+    testCompile "org.mockito:mockito-all:$mockitoVersion"
 }

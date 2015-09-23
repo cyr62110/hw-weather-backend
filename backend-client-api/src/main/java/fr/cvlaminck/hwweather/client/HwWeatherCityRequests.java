@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.client;
 
+import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
 import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.city.SearchCityRequest;
 
@@ -14,9 +15,10 @@ import java.util.concurrent.Future;
         this.client = client;
     }
 
-    public SearchCityResponse search(String city) throws IOException {
+    public SearchCityResponse search(String city) throws IOException, HwWeatherRequestException {
         SearchCityRequest request = new SearchCityRequest(client.getBaseUri(), client.getObjectMapper());
-        return request.execute();
+        request.setCity(city);
+        return request.call();
     }
 
 }

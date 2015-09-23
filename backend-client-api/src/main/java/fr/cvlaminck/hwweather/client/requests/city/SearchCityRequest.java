@@ -2,6 +2,7 @@ package fr.cvlaminck.hwweather.client.requests.city;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
+import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
 import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
 
@@ -21,7 +22,7 @@ public class SearchCityRequest
     @Override
     public Uri build() {
         if (city == null || city.isEmpty()) {
-            throw new IllegalStateException("city must not be null nor empty.");
+            throw new HwWeatherIllegalProtocolException("city must not be null nor empty.");
         }
 
         return getBaseUriBuilder()
