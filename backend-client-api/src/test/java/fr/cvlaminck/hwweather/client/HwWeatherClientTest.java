@@ -1,6 +1,8 @@
 package fr.cvlaminck.hwweather.client;
 
 import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
+import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
+import fr.cvlaminck.hwweather.client.resources.ExternalCityIdResource;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,6 +31,16 @@ public class HwWeatherClientTest {
 
     @Test
     public void testGetWeather() throws Exception {
+        ExternalCityIdResource city = new ExternalCityIdResource();
+        city.setProvider("nominatim");
+        city.setId("58404");
 
+        WeatherResponse response = client.weather().get(city);
+
+        assertNotNull(response);
+        assertNotNull(response.getCurrent());
+        assertFalse(response.getHourly().isEmpty());
+        assertFalse(response.getDaily().isEmpty());
+        assertEquals("Lille", response.getCity().getName());
     }
 }

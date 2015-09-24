@@ -1,8 +1,15 @@
 package fr.cvlaminck.hwweather.client.resources;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ExternalCityIdResource {
     private String provider;
     private String id;
+
+    @JsonIgnore
+    public boolean isValid() {
+        return (id != null && !id.isEmpty()) && (provider != null && !provider.isEmpty());
+    }
 
     public String getProvider() {
         return provider;

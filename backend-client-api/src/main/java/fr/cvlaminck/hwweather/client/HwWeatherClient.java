@@ -13,9 +13,14 @@ public class HwWeatherClient {
     private ExecutorService executorService;
 
     private HwWeatherCityRequests cityRequests = new HwWeatherCityRequests(this);
+    private HwWeatherWeatherRequests weatherRequests = new HwWeatherWeatherRequests(this);
 
     public HwWeatherCityRequests cities() {
         return cityRequests;
+    }
+
+    public HwWeatherWeatherRequests weather() {
+        return weatherRequests;
     }
 
     /* package */ Uri getBaseUri() {
