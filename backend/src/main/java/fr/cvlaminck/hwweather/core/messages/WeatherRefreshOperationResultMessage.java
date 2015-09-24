@@ -9,6 +9,8 @@ public class WeatherRefreshOperationResultMessage {
     private String cityId;
     private Collection<WeatherDataType> refreshedTypes = Collections.emptyList();
 
+    private boolean success;
+
     private int numberOfProviderCalled = 0;
     private int numberOfFreeCallUsed = 0;
     private double operationCost = 0d;
@@ -27,6 +29,14 @@ public class WeatherRefreshOperationResultMessage {
 
     public void setRefreshedTypes(Collection<WeatherDataType> refreshedTypes) {
         this.refreshedTypes = refreshedTypes;
+    }
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     public int getNumberOfProviderCalled() {

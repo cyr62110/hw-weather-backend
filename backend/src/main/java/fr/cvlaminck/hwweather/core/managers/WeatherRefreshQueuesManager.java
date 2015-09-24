@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
+import fr.cvlaminck.hwweather.core.exceptions.RefreshOperationFailedException;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationMessage;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationResultMessage;
 import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
@@ -50,7 +51,7 @@ public class WeatherRefreshQueuesManager {
         return resultQueue;
     }
 
-    public RefreshOperationSummary postRefreshOperationForCityAndWaitForResult(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
+    public RefreshOperationSummary postRefreshOperationForCityAndWaitForResult(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException, RefreshOperationFailedException {
         if (!typesToRefresh.isEmpty()) {
             postRefreshForCity(city, typesToRefresh);
             return waitUntilCityWeatherIsRefreshed(city, typesToRefresh);
@@ -75,7 +76,7 @@ public class WeatherRefreshQueuesManager {
         }
     }
 
-    public RefreshOperationSummary waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException {
+    public RefreshOperationSummary waitUntilCityWeatherIsRefreshed(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoResultForWeatherRefreshOperationException, RefreshOperationFailedException {
         RefreshOperationSummary summary = null;
 
         //We declare the queue for receiving weather update and bind it to the right exchange
@@ -117,6 +118,9 @@ public class WeatherRefreshQueuesManager {
             //TODO wait for another message
             throw new NoResultForWeatherRefreshOperationException();
         }
+        if (!message.isSuccess()) {
+            throw new RefreshOperationFailedException(city, typesToRefresh);
+        }
         return summary;
     }
 
@@ -124,9 +128,23 @@ public class WeatherRefreshQueuesManager {
         WeatherRefreshOperationResultMessage message = new WeatherRefreshOperationResultMessage();
         message.setCityId(city.getId());
         message.setRefreshedTypes(summary.getRefreshedTypes());
+        message.setSuccess(true);
+
         message.setNumberOfProviderCalled(summary.getNumberOfProviderCalled());
         message.setNumberOfFreeCallUsed(summary.getNumberOfFreeCallUsed());
         message.setOperationCost(summary.getOperationCost());
+
+        amqpTemplate.convertAndSend(weatherRefreshOperationResultExchange.getName(),
+                city.getId(),
+                message);
+    }
+
+    public void postRefreshOperationFailedForCity(CityEntity city, Collection<WeatherDataType> typesToRefresh, Throwable t) {
+        //TODO find something to send the error through the message broker.
+        WeatherRefreshOperationResultMessage message = new WeatherRefreshOperationResultMessage();
+        message.setCityId(city.getId());
+        message.setRefreshedTypes(typesToRefresh);
+        message.setSuccess(false);
 
         amqpTemplate.convertAndSend(weatherRefreshOperationResultExchange.getName(),
                 city.getId(),

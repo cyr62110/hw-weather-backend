@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
+import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
@@ -19,7 +20,7 @@ public class WeatherDataProviderManager {
     @Autowired
     private WeatherDataProviderSelectionManager weatherDataProviderSelectionManager;
 
-    public ExternalWeatherData refresh(double latitude, double longitude, Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+    public ExternalWeatherData refresh(double latitude, double longitude, Set<ExternalWeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException, fr.cvlaminck.hwweather.core.exceptions.DataProviderException {
         ExternalWeatherData data = new ExternalWeatherData();
 
         //Set of types of weather data that has not been refreshed by another provider in the list.
@@ -31,13 +32,17 @@ public class WeatherDataProviderManager {
         data.getMetadata().setNumberOfFreeCallUsed(result.getNumberOfFreeCallUsed());
         data.getMetadata().setOperationCost(result.getOperationCost());
 
-        for (WeatherDataProvider provider: result.getProvidersToUse()) {
-            //We use the next provider in the list to get data.
-            ExternalWeatherData response = provider.refresh(latitude, longitude, typesToRefreshLeft);
-            //We merge the data with the one provided by the other providers preceding this one
-            data = mergeExternalWeatherData(data, response);
-            //Then we update the list of missing data
-            typesToRefreshLeft = removeResolvedTypeFromTypesToRefresh(typesToRefreshLeft, data);
+        try {
+            for (WeatherDataProvider provider : result.getProvidersToUse()) {
+                //We use the next provider in the list to get data.
+                ExternalWeatherData response = provider.refresh(latitude, longitude, typesToRefreshLeft);
+                //We merge the data with the one provided by the other providers preceding this one
+                data = mergeExternalWeatherData(data, response);
+                //Then we update the list of missing data
+                typesToRefreshLeft = removeResolvedTypeFromTypesToRefresh(typesToRefreshLeft, data);
+            }
+        } catch (DataProviderException ex) {
+            throw new fr.cvlaminck.hwweather.core.exceptions.DataProviderException(ex.getDataProvider(), ex);
         }
         return data;
     }

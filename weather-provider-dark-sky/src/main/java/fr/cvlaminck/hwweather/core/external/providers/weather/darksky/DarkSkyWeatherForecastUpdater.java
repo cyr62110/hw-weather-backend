@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.external.providers.weather.darksky;
 
+import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.weather.*;
 import fr.cvlaminck.hwweather.core.external.model.weather.enums.TemperatureUnit;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
@@ -21,9 +22,13 @@ public class DarkSkyWeatherForecastUpdater {
         this.dataProvider = dataProvider;
     }
 
-    public ExternalWeatherData refresh(double latitude, double longitude) {
-        DarkSkyForecastResponse response = getRestApi().getForecast(getApiKey(), latitude, longitude);
-        return convertResponseToResource(response);
+    public ExternalWeatherData refresh(double latitude, double longitude) throws DataProviderException {
+        try {
+            DarkSkyForecastResponse response = getRestApi().getForecast(getApiKey(), latitude, longitude);
+            return convertResponseToResource(response);
+        } catch (Throwable t) {
+            throw new DataProviderException(dataProvider, t);
+        }
     }
 
     private DarkSkyWeatherWeatherAPI getRestApi() {

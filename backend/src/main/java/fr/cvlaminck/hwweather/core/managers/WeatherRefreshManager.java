@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.managers;
 
+import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
 import fr.cvlaminck.hwweather.core.external.model.weather.*;
 import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
@@ -36,7 +37,7 @@ public class WeatherRefreshManager {
     @Autowired
     private HourlyForecastRepository hourlyForecastRepository;
 
-    public RefreshOperationSummary refresh(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException {
+    public RefreshOperationSummary refresh(CityEntity city, Collection<WeatherDataType> typesToRefresh) throws NoProviderAvailableForRefreshOperationException, DataProviderException {
         RefreshOperationSummary summary = new RefreshOperationSummary();
         summary.setCity(city);
         summary.setTypesToRefresh(typesToRefresh);

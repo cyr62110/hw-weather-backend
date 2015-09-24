@@ -1,7 +1,7 @@
 package fr.cvlaminck.hwweather.front.exceptions;
 
+import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
 import fr.cvlaminck.hwweather.core.exceptions.clients.HwWeatherCoreClientException;
-import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 
 import java.util.Arrays;
 import java.util.List;

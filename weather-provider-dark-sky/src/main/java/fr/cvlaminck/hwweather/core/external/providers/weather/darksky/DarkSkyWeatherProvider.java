@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.core.external.providers.weather.darksky;
 
 import fr.cvlaminck.hwweather.core.external.annotations.DataProvider;
+import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
@@ -46,7 +47,8 @@ public class DarkSkyWeatherProvider
     }
 
     @Override
-    public ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh) {
+    public ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh)
+        throws DataProviderException {
         return updater.refresh(latitude, longitude);
     }
 

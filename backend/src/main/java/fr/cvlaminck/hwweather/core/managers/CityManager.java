@@ -3,7 +3,6 @@ package fr.cvlaminck.hwweather.core.managers;
 import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
 import fr.cvlaminck.hwweather.core.exceptions.clients.CityNotFoundException;
-import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.data.model.city.CityExternalIdEntity;
@@ -29,8 +28,6 @@ public class CityManager {
                 city = cityRepository.findOne(id);
             }
             city = refreshCityIfMissingI18NName(city, languageCode);
-        } catch (CityDataProviderException e) {
-            throw new DataProviderException(e.getDataProvider(), e);
         } catch (NoProviderWithNameException e) {
         }
         if (city == null) {
@@ -39,12 +36,12 @@ public class CityManager {
         return city;
     }
 
-    public CityEntity updateOrAddCityWithExternalId(String externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
+    public CityEntity updateOrAddCityWithExternalId(String externalId, String languageCode) throws DataProviderException, NoProviderWithNameException {
         CityExternalIdEntity externalIdEntity = CityExternalIdEntity.parse(externalId);
         return importCityWithExternalId(externalIdEntity, languageCode);
     }
 
-    private CityEntity getOrImportCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
+    private CityEntity getOrImportCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws DataProviderException, NoProviderWithNameException {
         CityEntity city = cityRepository.findByExternalId(externalId);
         if(city == null) {
             city = importCityWithExternalId(externalId, languageCode);
@@ -52,7 +49,7 @@ public class CityManager {
         return city;
     }
 
-    private CityEntity importCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws CityDataProviderException, NoProviderWithNameException {
+    private CityEntity importCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws DataProviderException, NoProviderWithNameException {
         ExternalCityResource externalCity = cityDataProviderManager.findById(externalId.getDataProvider(), externalId.getExternalId());
         if (externalCity == null) {
             return null;

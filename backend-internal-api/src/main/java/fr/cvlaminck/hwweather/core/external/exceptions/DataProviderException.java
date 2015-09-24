@@ -1,17 +1,28 @@
 package fr.cvlaminck.hwweather.core.external.exceptions;
 
 import fr.cvlaminck.hwweather.core.external.providers.DataProvider;
-import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
 
-public class CityDataProviderException
+public class DataProviderException
     extends Exception {
     private final static String MESSAGE = "Exception occurred in provider '%s'";
 
     private DataProvider dataProvider;
 
-    public CityDataProviderException(DataProvider provider, String additionalMessage, Throwable cause) {
+    public DataProviderException(DataProvider provider, String additionalMessage, Throwable cause) {
         super(formatMessage(provider, additionalMessage), cause);
         this.dataProvider = provider;
+    }
+
+    public DataProviderException(DataProvider provider, String additionalMessage) {
+        this(provider, additionalMessage, null);
+    }
+
+    public DataProviderException(DataProvider provider, Throwable cause) {
+        this(provider, null, cause);
+    }
+
+    public DataProviderException(DataProvider provider) {
+        this(provider, null, null);
     }
 
     private static String formatMessage(DataProvider provider, String additionalMessage) {

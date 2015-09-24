@@ -2,11 +2,7 @@ package fr.cvlaminck.hwweather.front.controllers.user;
 
 import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
-import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
-import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
-import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
-import fr.cvlaminck.hwweather.core.exceptions.clients.CityNotFoundException;
-import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
+import fr.cvlaminck.hwweather.core.exceptions.HwWeatherCoreException;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshQueuesManager;
@@ -17,11 +13,13 @@ import fr.cvlaminck.hwweather.front.converters.WeatherDataConverter;
 import fr.cvlaminck.hwweather.front.exceptions.MissingTypeException;
 import fr.cvlaminck.hwweather.front.exceptions.UnknownTypeException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -49,8 +47,8 @@ public class WeatherController {
     @RequestMapping(method = RequestMethod.GET, value = "/{sTypes}")
     public WeatherResponse getTypes(@PathVariable String cityId,
                                     @PathVariable String sTypes,
-                                      HttpServletResponse response)
-            throws CityNotFoundException, DataProviderException, NoResultForWeatherRefreshOperationException, NoProviderWithNameException, MissingTypeException, UnknownTypeException {
+                                    HttpServletResponse response)
+            throws HwWeatherCoreException {
         if (sTypes == null || sTypes.isEmpty()) {
             throw new MissingTypeException();
         }
@@ -62,7 +60,7 @@ public class WeatherController {
         Collection<WeatherDataType> types = new ArrayList<>();
         for (String sType : sTypes.split("\\+")) {
             try {
-                types.add(WeatherDataType.valueOf(sType));
+                types.add(WeatherDataType.valueOf(sType.toUpperCase()));
             } catch (IllegalArgumentException ex) {
                 throw new UnknownTypeException(sType);
             }
@@ -90,7 +88,7 @@ public class WeatherController {
     private WeatherResponse getWeather(String cityId,
                                        Collection<fr.cvlaminck.hwweather.data.model.WeatherDataType> types,
                                        HttpServletResponse response)
-            throws CityNotFoundException, NoResultForWeatherRefreshOperationException, DataProviderException, NoProviderWithNameException {
+            throws HwWeatherCoreException {
         CityEntity city = cityManager.getCity(cityId, "en-US"); //TODO handle language
         WeatherData data = weatherManager.getWeather(city, types);
 

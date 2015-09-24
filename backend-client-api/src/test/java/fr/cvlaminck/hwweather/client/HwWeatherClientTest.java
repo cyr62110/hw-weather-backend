@@ -26,4 +26,9 @@ public class HwWeatherClientTest {
         assertFalse(response.getResults().isEmpty());
         assertEquals("Paris", response.getResults().iterator().next().getName());
     }
+
+    @Test
+    public void testGetWeather() throws Exception {
+
+    }
 }

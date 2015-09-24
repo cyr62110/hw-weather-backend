@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.listeners;
 
+import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderAvailableForRefreshOperationException;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshQueuesManager;
@@ -50,7 +51,8 @@ public class WeatherRefreshOperationListener
 
             log.info("Weather refresh operation finished for city '{}'. Refreshed types: {}", message.getCityId(), summary.getRefreshedTypes());
             weatherRefreshQueuesManager.postRefreshOperationFinishedForCity(city, summary);
-        } catch (NoProviderAvailableForRefreshOperationException e) {
+        } catch (NoProviderAvailableForRefreshOperationException | DataProviderException e) {
+            weatherRefreshQueuesManager.postRefreshOperationFailedForCity(city, message.getTypesToRefresh(), e);
             e.printStackTrace(); //TODO Better handling of the error.
         }
     }

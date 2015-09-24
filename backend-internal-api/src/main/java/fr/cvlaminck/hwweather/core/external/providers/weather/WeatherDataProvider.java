@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.core.external.providers.weather;
 
+import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.DataProvider;
@@ -36,6 +37,6 @@ public interface WeatherDataProvider
      * The weather data should contains all types described in typesToRefresh.
      * It may also contain more type
      */
-    ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh);
+    ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh) throws DataProviderException;
 
 }

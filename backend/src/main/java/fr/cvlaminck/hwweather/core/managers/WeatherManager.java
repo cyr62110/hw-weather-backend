@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.NoResultForWeatherRefreshOperationException;
+import fr.cvlaminck.hwweather.core.exceptions.RefreshOperationFailedException;
 import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
 import fr.cvlaminck.hwweather.core.model.WeatherData;
 import fr.cvlaminck.hwweather.core.utils.DateUtils;
@@ -33,11 +34,11 @@ public class WeatherManager {
     @Autowired
     private WeatherRefreshQueuesManager weatherRefreshQueuesManager;
 
-    public WeatherData getWeather(CityEntity city, Collection<WeatherDataType> requestedTypes) throws NoResultForWeatherRefreshOperationException {
+    public WeatherData getWeather(CityEntity city, Collection<WeatherDataType> requestedTypes) throws NoResultForWeatherRefreshOperationException, RefreshOperationFailedException {
         return getWeather(city, requestedTypes, true);
     }
 
-    public WeatherData getWeather(CityEntity city, Collection<WeatherDataType> requestedTypes, boolean refreshIfNecessary) throws NoResultForWeatherRefreshOperationException {
+    public WeatherData getWeather(CityEntity city, Collection<WeatherDataType> requestedTypes, boolean refreshIfNecessary) throws NoResultForWeatherRefreshOperationException, RefreshOperationFailedException {
         WeatherData data = new WeatherData();
         data.setCity(city);
         data.setTypes(requestedTypes);

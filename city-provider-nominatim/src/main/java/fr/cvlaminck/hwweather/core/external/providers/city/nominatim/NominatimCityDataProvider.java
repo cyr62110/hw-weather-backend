@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import fr.cvlaminck.hwweather.core.external.annotations.DataProvider;
 import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
+import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
 import fr.cvlaminck.nominatim.Nominatim;
@@ -28,7 +29,7 @@ public class NominatimCityDataProvider
     }
 
     @Override
-    public Collection<ExternalCityResource> searchByName(String name) throws CityDataProviderException {
+    public Collection<ExternalCityResource> searchByName(String name) throws DataProviderException {
         List<Place> results = null;
         try {
             results = Nominatim.search()
@@ -36,9 +37,9 @@ public class NominatimCityDataProvider
                     .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
                     .get();
         } catch (IOException e) {
-            throw new CityDataProviderException(this, "Error while communicating with API", e);
+            throw new DataProviderException(this, "Error while communicating with API", e);
         } catch (NominatimAPIException e) {
-            throw new CityDataProviderException(this, "Error in result format", e);
+            throw new DataProviderException(this, "Error in result format", e);
         }
 
         return results.stream()
@@ -48,7 +49,7 @@ public class NominatimCityDataProvider
     }
 
     @Override
-    public ExternalCityResource findByExternalId(String id) throws CityDataProviderException {
+    public ExternalCityResource findByExternalId(String id) throws DataProviderException {
         List<Place> results = null;
         try {
             results = Nominatim.lookUp()
@@ -56,11 +57,11 @@ public class NominatimCityDataProvider
                 .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
                 .get();
         } catch (IOException e) {
-            throw new CityDataProviderException(this, "Error while communicating with API", e);
+            throw new DataProviderException(this, "Error while communicating with API", e);
         } catch (NominatimAPIException e) {
-            throw new CityDataProviderException(this, "Error in result format", e);
+            throw new DataProviderException(this, "Error in result format", e);
         } catch (NumberFormatException e) {
-            throw new CityDataProviderException(this, "Id format is not supported by this provider", e);
+            throw new DataProviderException(this, "Id format is not supported by this provider", e);
         }
         return results.stream()
                 .map((p) -> convertPlaceToResource(p))
