@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Component
 public class WeatherManager {
@@ -95,16 +96,22 @@ public class WeatherManager {
     }
 
     private void fillWeatherDataWithHourlyUsingDatabase(WeatherData data) {
-        LocalDate startDate = DateUtils.today();
-        LocalDate endDate = startDate.plusDays(1);
-        Collection<HourlyForecastEntity> hourlyList = hourlyForecastRepository.findByCityIdAndDayBetween(data.getCity().getId(), startDate, endDate);
+        LocalDate today = DateUtils.today();
+        Collection<HourlyForecastEntity> hourlyList = hourlyForecastRepository.findByCityIdAndDayGreaterThanEqual(data.getCity().getId(), today);
+        hourlyList = hourlyList.stream()
+                .sorted((a, b) -> a.getDay().compareTo(b.getDay()))
+                .limit(2)
+                .collect(Collectors.toList());
         data.setHourlyList(hourlyList);
     }
 
     private void fillWeatherDataWithDailyUsingDatabase(WeatherData data) {
-        LocalDate startDate = DateUtils.today();
-        LocalDate endDate = startDate.plusDays(7);
-        Collection<DailyForecastEntity> dailyList = dailyForecastRepository.findByCityIdAndWeekBetween(data.getCity().getId(), startDate, endDate);
+        LocalDate firstDayOfWeek = DateUtils.firstDayOfWeek();
+        Collection<DailyForecastEntity> dailyList = dailyForecastRepository.findByCityIdAndWeekGreaterThanEqual(data.getCity().getId(), firstDayOfWeek);
+        dailyList = dailyList.stream()
+                .sorted((a, b) -> a.getWeek().compareTo(b.getWeek()))
+                .limit(2)
+                .collect(Collectors.toList());
         data.setDailyList(dailyList);
     }
 }

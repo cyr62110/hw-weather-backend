@@ -11,6 +11,6 @@ public interface DailyForecastRepository
 
     public DailyForecastEntity findByCityIdAndWeek(String cityId, LocalDate week);
 
-    public Collection<DailyForecastEntity> findByCityIdAndWeekBetween(String cityId, LocalDate startDate, LocalDate endDate);
+    public Collection<DailyForecastEntity> findByCityIdAndWeekGreaterThanEqual(String cityId, LocalDate startDate);
 
 }

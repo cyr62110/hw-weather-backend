@@ -15,6 +15,14 @@ public final class DateUtils {
         return LocalDate.now(defaultZone());
     }
 
+    public static LocalDate firstDayOfWeek(LocalDate date) {
+        return date.minusDays(date.getDayOfWeek().getValue() - 1);
+    }
+
+    public static LocalDate firstDayOfWeek() {
+        return firstDayOfWeek(today());
+    }
+
     public static LocalDateTime now() { return LocalDateTime.now(defaultZone()); }
 
 }

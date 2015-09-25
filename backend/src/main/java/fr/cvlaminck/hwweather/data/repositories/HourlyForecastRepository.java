@@ -12,6 +12,6 @@ public interface HourlyForecastRepository
 
     public HourlyForecastEntity findByCityIdAndDay(String cityId, LocalDate day);
 
-    public Collection<HourlyForecastEntity> findByCityIdAndDayBetween(String cityId, LocalDate startDate, LocalDate endDate);
+    public Collection<HourlyForecastEntity> findByCityIdAndDayGreaterThanEqual(String cityId, LocalDate startDate);
 
 }
