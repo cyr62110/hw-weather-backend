@@ -1,8 +1,9 @@
-version 'unspecified'
-
 apply plugin: 'java'
+apply plugin: 'maven-publish'
+apply plugin: 'com.jfrog.bintray'
 
 sourceCompatibility = 1.7
+version '0.1'
 
 dependencies {
     compile 'fr.cvlaminck:java-uri-builder:1.2'
@@ -11,4 +12,27 @@ dependencies {
 
     testCompile "junit:junit:$jUnitVersion"
     testCompile "org.mockito:mockito-all:$mockitoVersion"
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            groupId 'fr.cvlaminck.hwweather'
+            artifactId 'client'
+        }
+    }
+}
+
+bintray {
+    user = System.getProperty('bintray.user')
+    key = System.getProperty('bintray.key')
+    publications = ['maven']
+    pkg {
+        repo = 'maven'
+        name = 'hwweather-client'
+        version {
+            name = project.version
+        }
+    }
 }

@@ -8,6 +8,15 @@ allprojects {
         mockitoVersion = '1.9.0'
     }
 
+    buildscript {
+        repositories {
+            jcenter()
+        }
+        dependencies {
+            classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+        }
+    }
+
     repositories {
         jcenter()
         maven {
