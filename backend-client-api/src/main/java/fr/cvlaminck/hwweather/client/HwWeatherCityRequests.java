@@ -7,7 +7,7 @@ import fr.cvlaminck.hwweather.client.requests.city.SearchCityRequest;
 import java.io.IOException;
 import java.util.concurrent.Future;
 
-/* package */ class HwWeatherCityRequests {
+public class HwWeatherCityRequests {
 
     private HwWeatherClient client;
 

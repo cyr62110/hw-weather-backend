@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-/* package */ class HwWeatherWeatherRequests {
+public class HwWeatherWeatherRequests {
     private HwWeatherClient client;
 
     HwWeatherWeatherRequests(HwWeatherClient client) {
