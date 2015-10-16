@@ -1,0 +1,12 @@
+#! /bin/bash
+
+export JAVA_HOME=$OPENSHIFT_DATA_DIR/jre_8
+
+# Download Java 8 from Oracle website and install it in $OPENSHIFT_DATA_DIR/jre_8 folder
+if [ ! -d $JAVA_HOME ]; then
+    mkdir -p $JAVA_HOME
+    cd $JAVA_HOME
+    wget --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie"  http://download.oracle.com/otn-pub/java/jdk/8u60-b27/jre-8u60-linux-x64.tar.gz
+    tar -xzf jre-8u60-linux-x64.tar.gz --strip-components=1
+    rm -f jre-8u60-linux-x64.tar.gz
+fi

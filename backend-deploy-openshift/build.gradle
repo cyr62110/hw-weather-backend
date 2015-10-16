@@ -1,0 +1,103 @@
+/**
+ * Commands to remove the template of application that is in the diy cartridge.
+ * git rm -rf .openshift README.md diy misc
+ * git commit -m 'Removed template'
+ *
+ * At the root of the backend-deploy-openshift, put the application.yml with the
+ * production configuration.
+ */
+
+ext {
+    application = 'hwweather'
+}
+
+def gitDirectory = project.buildDir.path+'/git'
+def hwWeatherDirectory = gitDirectory+'/hwweather'
+def backendDistTar = project(':backend').buildDir.path+'/distributions/backend.tar'
+def backendName = project(':backend').name.toString()
+def backendVersion = project(':backend').version.toString()
+
+task checkRHCIsAvailable {
+    doLast {
+        def result = exec {
+            commandLine '/usr/bin/rhc'
+            args '--version'
+        }
+        if (result.exitValue != 0) {
+            throw new Exception("rhc is not installed. Check https://developers.openshift.com/en/getting-started-overview.html to install it.");
+        }
+    }
+}
+
+task checkOutDeploymentRepository(dependsOn: ['clean', 'checkRHCIsAvailable']) {
+    doLast {
+        def result = exec {
+            commandLine '/usr/bin/rhc'
+            args 'git-clone', '-a', project.ext.application, '-r', gitDirectory
+        }
+        if (result.exitValue != 0) {
+            throw new Exception("'$application'cannot be cloned in build directory. Did you run 'rhc setup'?");
+        }
+    }
+}
+
+task copyDistribution(dependsOn: [':backend:distTar', 'checkOutDeploymentRepository']) {
+    doLast {
+        // Remove all files contained in the hwweather directory and the directory itself
+        delete(hwWeatherDirectory)
+        // Recreate the directory with the content of the distribution
+        mkdir(hwWeatherDirectory)
+        exec {
+            commandLine '/usr/bin/tar'
+            args '-xf', backendDistTar
+            args '-C', hwWeatherDirectory
+            args '--strip-components=1'
+        }
+    }
+}
+
+task copyConfiguration(type: Copy, dependsOn: ['copyDistribution']) {
+    from 'application.yml'
+    into "$hwWeatherDirectory/config"
+}
+
+task copyActionHooks(type: Copy, dependsOn: ['checkOutDeploymentRepository']) {
+    from 'action-hooks'
+    into "$gitDirectory/.openshift/action_hooks"
+}
+
+task deploy(dependsOn: ['copyDistribution', 'copyConfiguration', 'copyActionHooks']) {
+    doLast {
+        // Add the file to git if they were not tracked
+        def gitAddResult = exec {
+            workingDir gitDirectory
+            commandLine '/usr/bin/git'
+            args 'add', '-f', '.openshift/action_hooks/*', 'hwweather/lib/*', 'hwweather/config/application.yml'
+        }
+
+        def gitCommitResult = exec {
+            workingDir gitDirectory
+            commandLine '/usr/bin/git'
+            args 'commit', '-m', "Deployment of version '$backendVersion'"
+        }
+        if (gitCommitResult.exitValue != 0) {
+            throw new Exception("Failed to deploy new version. Git Commit failed with result $gitCommitResult.")
+        }
+
+        def gitPushResult = exec {
+            workingDir gitDirectory
+            commandLine '/usr/bin/git'
+            args 'push'
+        }
+        if (gitPushResult.exitValue != 0) {
+            throw new Exception("Failed to deploy new version. Git Push failed with result $gitPushResult.")
+        }
+    }
+}
+
+task clean {
+    doLast {
+        //We remove the git directory
+        delete(gitDirectory)
+    }
+}

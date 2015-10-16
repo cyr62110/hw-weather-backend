@@ -1,0 +1,21 @@
+#!/bin/bash
+
+export HWWEATHER_HOME=$OPENSHIFT_REPO_DIR/hwweather
+
+cd $HWWEATHER_HOME
+
+export JAVA_HOME=$OPENSHIFT_DATA_DIR/jre_8
+export PATH=$JAVA_HOME/bin:$PATH
+
+# List all the jars in $HWWEATHER_HOME/lib folder to create the classpath
+JARS=$(ls lib/*.jar)
+CLASSPATH=$(echo $JARS | sed -e "s/ /:/g")
+
+# Export the address of the server so it can bind to it and communicate properly with Openshift infrastructure.
+export SERVER_ADDRESS=$OPENSHIFT_DIY_IP
+export SERVER_PORT=$OPENSHIFT_DIY_PORT
+
+# Run the backend as a detached process
+nohup java -Xms384m -Xmx412m \
+    -classpath "$CLASSPATH" fr.cvlaminck.hwweather.Application \
+    |& /usr/bin/logshifter -tag diy &

@@ -1,0 +1,2 @@
+# We ignore the configuration for the production server so we cannot push it on GitHub :)
+application.yml

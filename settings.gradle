@@ -1,8 +1,10 @@
-include 'backend-internal-api'
 include 'backend'
+include 'backend-client-api'
+include 'backend-internal-api'
+
+include 'backend-deploy-openshift'
 
 include 'weather-provider-dark-sky'
 
 include 'city-provider-nominatim'
-include 'backend-client-api'
 
