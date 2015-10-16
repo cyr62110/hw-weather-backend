@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.client.resources.weather;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.TemperatureUnit;
 
 public class DailyForecastResource
-    extends AbstractWeatherResource {
+        extends AbstractWeatherResource {
     private double minTemperatureInCelsius;
     private double maxTemperatureInCelsius;
 

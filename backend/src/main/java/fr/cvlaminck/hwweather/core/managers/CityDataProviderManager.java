@@ -2,18 +2,16 @@ package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
+import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
+import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
-import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
-
-import javax.annotation.PostConstruct;
 
 @Component
 public class CityDataProviderManager {
@@ -45,7 +43,7 @@ public class CityDataProviderManager {
 
     public ExternalCityResource findById(String providerName, String cityId) throws NoProviderWithNameException, DataProviderException {
         CityDataProvider provider = dataProviderByNameMap.get(providerName);
-        if( provider == null ) {
+        if (provider == null) {
             throw new NoProviderWithNameException(providerName);
         }
         try {

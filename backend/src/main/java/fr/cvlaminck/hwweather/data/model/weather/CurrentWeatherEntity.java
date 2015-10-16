@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Document(collection = "current")
 public class CurrentWeatherEntity
-    extends AbstractWeatherDataEntity {
+        extends AbstractWeatherDataEntity {
 
     @Id
     private String id;

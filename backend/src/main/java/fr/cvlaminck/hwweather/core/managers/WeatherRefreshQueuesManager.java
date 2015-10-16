@@ -7,16 +7,13 @@ import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationResultMessage
 import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
-import fr.cvlaminck.hwweather.data.model.weather.AbstractWeatherDataEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 @Component
@@ -40,7 +37,7 @@ public class WeatherRefreshQueuesManager {
     private Logger log = LoggerFactory.getLogger(WeatherRefreshQueuesManager.class);
 
     private Queue getQueueForCity(CityEntity city) {
-        String queueName = "weather-refresh-operation-result-" + city.getId()+ "-" + new Random().nextInt(); //TODO: find a way to make it uniq for a thread.
+        String queueName = "weather-refresh-operation-result-" + city.getId() + "-" + new Random().nextInt(); //TODO: find a way to make it uniq for a thread.
 
         Queue resultQueue = new Queue(queueName, false, false, true);
         Binding binding = BindingBuilder.bind(resultQueue).to(weatherRefreshOperationResultExchange).with(city.getId());
@@ -104,7 +101,8 @@ public class WeatherRefreshQueuesManager {
                     summary.setOperationCost(message.getOperationCost());
                 }
             }
-        } catch (InterruptedException e) {}
+        } catch (InterruptedException e) {
+        }
 
         //We delete the queue since it is no more necessary
         amqpAdmin.deleteQueue(resultQueue.getName());

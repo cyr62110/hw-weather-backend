@@ -2,13 +2,13 @@ package fr.cvlaminck.hwweather.core.model;
 
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
-import fr.cvlaminck.hwweather.core.model.RefreshPlan;
 import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RefreshPlanTest {
 

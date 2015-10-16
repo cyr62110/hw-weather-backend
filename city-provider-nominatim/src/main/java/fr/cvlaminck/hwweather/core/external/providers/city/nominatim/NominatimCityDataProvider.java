@@ -1,13 +1,6 @@
 package fr.cvlaminck.hwweather.core.external.providers.city.nominatim;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import fr.cvlaminck.hwweather.core.external.annotations.DataProvider;
-import fr.cvlaminck.hwweather.core.external.exceptions.CityDataProviderException;
 import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
@@ -16,6 +9,12 @@ import fr.cvlaminck.nominatim.exceptions.NominatimAPIException;
 import fr.cvlaminck.nominatim.model.OsmType;
 import fr.cvlaminck.nominatim.model.Place;
 import fr.cvlaminck.nominatim.model.PlaceType;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @DataProvider
 public class NominatimCityDataProvider
@@ -53,9 +52,9 @@ public class NominatimCityDataProvider
         List<Place> results = null;
         try {
             results = Nominatim.lookUp()
-                .id(OsmType.RELATION, Long.parseLong(id))
-                .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
-                .get();
+                    .id(OsmType.RELATION, Long.parseLong(id))
+                    .acceptLanguage(Arrays.asList("en-US")) //FIXME For now, I dont want to care about the language of the result.
+                    .get();
         } catch (IOException e) {
             throw new DataProviderException(this, "Error while communicating with API", e);
         } catch (NominatimAPIException e) {

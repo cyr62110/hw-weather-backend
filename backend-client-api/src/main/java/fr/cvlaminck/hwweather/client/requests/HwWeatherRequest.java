@@ -1,6 +1,5 @@
 package fr.cvlaminck.hwweather.client.requests;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
 import fr.cvlaminck.builders.uri.UriBuilder;
@@ -14,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -23,7 +21,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 public abstract class HwWeatherRequest<T>
-    implements Callable<T> {
+        implements Callable<T> {
 
     private Uri baseUri;
     private Class<T> responseClass;
@@ -113,7 +111,7 @@ public abstract class HwWeatherRequest<T>
 
     protected void handleServerError(URL requestUrl, String requestContent,
                                      int responseCode, String responseContent, Map<String, List<String>> responseHeaders)
-        throws HwWeatherServerException {
+            throws HwWeatherServerException {
         throw new HwWeatherServerException(requestUrl, requestContent, responseCode);
     }
 

@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.client.exceptions;
 import java.net.URL;
 
 public abstract class HwWeatherRequestException
-    extends Exception {
+        extends Exception {
 
     private URL requestUrl;
     private String requestContent;

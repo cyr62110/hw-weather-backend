@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.time.LocalDate;
 
 public interface CurrentWeatherRepository
-    extends MongoRepository<CurrentWeatherEntity, String> {
+        extends MongoRepository<CurrentWeatherEntity, String> {
 
     @Query("{cityId: ?0, day: ?1}")
     public CurrentWeatherEntity findByCityIdAndDay(String cityId, LocalDate day);

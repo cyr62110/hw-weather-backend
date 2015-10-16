@@ -1,7 +1,6 @@
 package fr.cvlaminck.hwweather.core.external.model.weather;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class ExternalCurrentWeatherResource
         extends ExternalWeatherResource {

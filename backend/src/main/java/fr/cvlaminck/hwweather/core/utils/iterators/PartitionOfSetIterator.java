@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PartitionOfSetIterator<T>
-    implements Iterator<List<Set<T>>> {
+        implements Iterator<List<Set<T>>> {
 
     private List<T> sourceSet;
 
@@ -38,7 +38,7 @@ public class PartitionOfSetIterator<T>
 
     private List<Set<T>> convertToNextPartition(Integer[] q) {
         Map<Integer, Set<T>> nextPartitionMap = new HashMap<>();
-        for (int i = 0; i < q.length; i ++) {
+        for (int i = 0; i < q.length; i++) {
             Set set = nextPartitionMap.get(q[i]);
             if (set == null) {
                 set = new HashSet<>();
@@ -53,6 +53,7 @@ public class PartitionOfSetIterator<T>
     }
 
     private int nc;
+
     private boolean nexequ(int n, Integer[] p, Integer[] q, boolean mtc) {
         if (!mtc) {
             nc = 1;

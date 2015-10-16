@@ -6,6 +6,7 @@ public enum WeatherDataType {
     HOURLY("HOURLY");
 
     private String name;
+
     WeatherDataType(String name) {
         this.name = name;
     }

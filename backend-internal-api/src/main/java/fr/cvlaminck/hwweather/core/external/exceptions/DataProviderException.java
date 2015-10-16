@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.core.external.exceptions;
 import fr.cvlaminck.hwweather.core.external.providers.DataProvider;
 
 public class DataProviderException
-    extends Exception {
+        extends Exception {
     private final static String MESSAGE = "Exception occurred in provider '%s'";
 
     private DataProvider dataProvider;

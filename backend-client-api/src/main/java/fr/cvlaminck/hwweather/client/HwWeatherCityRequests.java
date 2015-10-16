@@ -5,7 +5,6 @@ import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.city.SearchCityRequest;
 
 import java.io.IOException;
-import java.util.concurrent.Future;
 
 public class HwWeatherCityRequests {
 

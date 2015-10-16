@@ -11,7 +11,7 @@ import java.util.Collection;
 
 @Document(collection = "daily")
 public class DailyForecastEntity
-    extends AbstractWeatherDataEntity {
+        extends AbstractWeatherDataEntity {
 
     @Id
     private String id;

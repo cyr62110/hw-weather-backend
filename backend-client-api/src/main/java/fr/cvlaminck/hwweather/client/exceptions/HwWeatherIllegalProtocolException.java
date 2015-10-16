@@ -1,7 +1,7 @@
 package fr.cvlaminck.hwweather.client.exceptions;
 
 public class HwWeatherIllegalProtocolException
-    extends RuntimeException {
+        extends RuntimeException {
 
     public HwWeatherIllegalProtocolException() {
     }

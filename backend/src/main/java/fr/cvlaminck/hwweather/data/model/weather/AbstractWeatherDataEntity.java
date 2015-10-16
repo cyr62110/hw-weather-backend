@@ -4,7 +4,7 @@ import fr.cvlaminck.hwweather.data.model.ExpirableEntity;
 import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 
 public abstract class AbstractWeatherDataEntity
-    extends ExpirableEntity {
+        extends ExpirableEntity {
 
     protected AbstractWeatherDataEntity() {
     }

@@ -6,7 +6,6 @@ import fr.cvlaminck.hwweather.core.managers.WeatherRefreshManager;
 import fr.cvlaminck.hwweather.core.managers.WeatherRefreshQueuesManager;
 import fr.cvlaminck.hwweather.core.messages.WeatherRefreshOperationMessage;
 import fr.cvlaminck.hwweather.core.model.RefreshOperationSummary;
-import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.data.repositories.CityRepository;
 import org.slf4j.Logger;
@@ -17,12 +16,9 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Collections;
-
 @Component
 public class WeatherRefreshOperationListener
-    implements MessageListener {
+        implements MessageListener {
 
     @Autowired
     private MessageConverter messageConverter;

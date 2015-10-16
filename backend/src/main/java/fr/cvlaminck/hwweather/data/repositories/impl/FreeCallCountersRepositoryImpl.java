@@ -51,7 +51,7 @@ public class FreeCallCountersRepositoryImpl
         Criteria criteria = Criteria.where("day").is(today);
         Update update = new Update();
         for (String counter : counters) {
-            String key = "counters."+counter;
+            String key = "counters." + counter;
             criteria = criteria.and(key).gt(0);
             update.inc(key, -1);
         }

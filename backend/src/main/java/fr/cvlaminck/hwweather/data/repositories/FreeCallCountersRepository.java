@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.Query;
 import java.time.LocalDate;
 
 public interface FreeCallCountersRepository
-    extends MongoRepository<FreeCallCountersEntity, String>, FreeCallCountersRepositoryCustom {
+        extends MongoRepository<FreeCallCountersEntity, String>, FreeCallCountersRepositoryCustom {
 
     @Query("{day: ?0}")
     public FreeCallCountersEntity findOneByDay(LocalDate day);

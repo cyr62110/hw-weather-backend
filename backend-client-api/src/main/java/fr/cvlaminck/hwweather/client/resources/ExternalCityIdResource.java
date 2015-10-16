@@ -29,6 +29,6 @@ public class ExternalCityIdResource {
 
     @Override
     public String toString() {
-        return "["+provider+":"+id+"]";
+        return "[" + provider + ":" + id + "]";
     }
 }

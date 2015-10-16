@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.core.exceptions.clients;
 import fr.cvlaminck.hwweather.core.exceptions.HwWeatherCoreException;
 
 public class HwWeatherCoreClientException
-    extends HwWeatherCoreException {
+        extends HwWeatherCoreException {
 
     private int responseCode;
 

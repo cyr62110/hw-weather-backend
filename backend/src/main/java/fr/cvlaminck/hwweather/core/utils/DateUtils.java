@@ -3,13 +3,15 @@ package fr.cvlaminck.hwweather.core.utils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
 
 public final class DateUtils {
 
-    private DateUtils() {}
+    private DateUtils() {
+    }
 
-    public static ZoneId defaultZone() { return ZoneId.of("UTC"); }
+    public static ZoneId defaultZone() {
+        return ZoneId.of("UTC");
+    }
 
     public static LocalDate today() {
         return LocalDate.now(defaultZone());
@@ -23,6 +25,8 @@ public final class DateUtils {
         return firstDayOfWeek(today());
     }
 
-    public static LocalDateTime now() { return LocalDateTime.now(defaultZone()); }
+    public static LocalDateTime now() {
+        return LocalDateTime.now(defaultZone());
+    }
 
 }

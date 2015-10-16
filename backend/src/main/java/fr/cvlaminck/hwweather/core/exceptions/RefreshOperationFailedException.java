@@ -9,7 +9,7 @@ import java.util.Collection;
  * Throws if the refresh operation ends in an error.
  */
 public class RefreshOperationFailedException
-    extends HwWeatherCoreException {
+        extends HwWeatherCoreException {
     private static final String MESSAGE = "Cannot refresh %s for city '%s'. Refresh operation ended up in an error. Check your log message.";
 
     public RefreshOperationFailedException(CityEntity city, Collection<WeatherDataType> typesToRefresh) {

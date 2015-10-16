@@ -6,6 +6,7 @@ public class WeatherConditionEntity {
         RAIN,
         STORM,
     }
+
     public enum SecondaryWeatherCondition {
         PARTLY_CLOUDY,
     }

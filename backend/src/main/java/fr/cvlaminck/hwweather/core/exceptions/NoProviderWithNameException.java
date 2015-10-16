@@ -1,7 +1,7 @@
 package fr.cvlaminck.hwweather.core.exceptions;
 
 public class NoProviderWithNameException
-    extends HwWeatherCoreException {
+        extends HwWeatherCoreException {
 
     private final static String MESSAGE = "No provider with name '%s' is registered.";
 

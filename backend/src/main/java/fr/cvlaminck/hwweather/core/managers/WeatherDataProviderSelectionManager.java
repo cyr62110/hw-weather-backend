@@ -97,7 +97,7 @@ public class WeatherDataProviderSelectionManager {
     }
 
     Set<RefreshPlan> buildRefreshPlans(Set<ExternalWeatherDataType> typesToRefresh, Map<Set<ExternalWeatherDataType>, List<WeatherDataProvider>> providersByRefreshTypeMap) {
-        Set <RefreshPlan> refreshPlans = new HashSet<>();
+        Set<RefreshPlan> refreshPlans = new HashSet<>();
         PartitionOfSetIterator<ExternalWeatherDataType> it = new PartitionOfSetIterator<>(typesToRefresh);
         while (it.hasNext()) {
             List<Set<ExternalWeatherDataType>> partition = it.next();
@@ -131,7 +131,7 @@ public class WeatherDataProviderSelectionManager {
                 if (i == 0) {
                     break;
                 }
-                i --;
+                i--;
             } else {
                 providers[i] = iterators[i].next();
                 if (i != partition.size() - 1) {
@@ -171,7 +171,7 @@ public class WeatherDataProviderSelectionManager {
 
     private boolean doesFirstKProvidersRefreshAllRequestedTypes(Set<ExternalWeatherDataType> typesToRefresh, WeatherDataProvider[] providers, int k) {
         Set<ExternalWeatherDataType> refreshedTypes = new HashSet<>();
-        for (int i = 0; i < k; i ++) {
+        for (int i = 0; i < k; i++) {
             refreshedTypes.addAll(providers[i].getTypes());
         }
         return refreshedTypes.containsAll(typesToRefresh);
@@ -182,7 +182,7 @@ public class WeatherDataProviderSelectionManager {
     }
 
     private Optional<RefreshPlan> findBestRefreshPlan(Set<RefreshPlan> refreshPlans, FreeCallCountersEntity freeCallCounters) {
-         return sortRefreshPlanToFindBestOne(refreshPlans, freeCallCounters)
+        return sortRefreshPlanToFindBestOne(refreshPlans, freeCallCounters)
                 .findFirst();
     }
 

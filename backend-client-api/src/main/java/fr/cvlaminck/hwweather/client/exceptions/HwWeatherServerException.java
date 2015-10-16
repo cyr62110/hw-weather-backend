@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.client.exceptions;
 import java.net.URL;
 
 public class HwWeatherServerException
-    extends HwWeatherRequestException {
+        extends HwWeatherRequestException {
     private static final String MESSAGE = "An internal server error occurred while processing the request. Retry the request later.";
 
     public HwWeatherServerException(URL requestUrl, int statusCode) {

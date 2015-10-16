@@ -2,7 +2,6 @@ package fr.cvlaminck.hwweather.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
-import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
 
 import java.util.concurrent.ExecutorService;
 

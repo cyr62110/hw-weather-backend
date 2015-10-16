@@ -9,7 +9,7 @@ public class DarkSkyHourlyData {
     private Collection<Data> data = Collections.emptyList();
 
     public static class Data
-        extends DarkSkyData {
+            extends DarkSkyData {
         private double temperature;
         private double apparentTemperature;
 

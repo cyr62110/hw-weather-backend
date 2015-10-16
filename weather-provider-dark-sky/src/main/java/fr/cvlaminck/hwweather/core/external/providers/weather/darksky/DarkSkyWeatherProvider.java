@@ -5,15 +5,13 @@ import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherData;
 import fr.cvlaminck.hwweather.core.external.model.weather.ExternalWeatherDataType;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import retrofit.RestAdapter;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 @DataProvider
 public class DarkSkyWeatherProvider
-    implements WeatherDataProvider {
+        implements WeatherDataProvider {
 
     private DarkSkyWeatherForecastUpdater updater = new DarkSkyWeatherForecastUpdater(this);
 
@@ -48,7 +46,7 @@ public class DarkSkyWeatherProvider
 
     @Override
     public ExternalWeatherData refresh(double latitude, double longitude, Collection<ExternalWeatherDataType> typesToRefresh)
-        throws DataProviderException {
+            throws DataProviderException {
         return updater.refresh(latitude, longitude);
     }
 

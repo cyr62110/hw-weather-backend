@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 
 public interface DailyForecastRepository
-    extends MongoRepository<DailyForecastEntity, String> {
+        extends MongoRepository<DailyForecastEntity, String> {
 
     public DailyForecastEntity findByCityIdAndWeek(String cityId, LocalDate week);
 

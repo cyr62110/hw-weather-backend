@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.data.model;
 
 import fr.cvlaminck.hwweather.core.utils.DateUtils;
 
-import java.time.*;
+import java.time.LocalDateTime;
 
 public abstract class ExpirableEntity {
 

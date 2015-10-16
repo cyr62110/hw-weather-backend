@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import java.util.Map;
 
 public class CityRepositoryImpl
-    implements CityRepositoryCustom {
+        implements CityRepositoryCustom {
 
     @Autowired
     private MongoOperations mongoOperations;

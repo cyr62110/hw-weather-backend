@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.core.external.providers.weather;
 import java.util.Objects;
 
 public abstract class AbstractWeatherDataProvider
-    implements WeatherDataProvider {
+        implements WeatherDataProvider {
 
     @Override
     public int hashCode() {

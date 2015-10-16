@@ -5,7 +5,8 @@ import org.junit.Test;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class PartitionOfSetIteratorTest {
 
@@ -26,7 +27,7 @@ public class PartitionOfSetIteratorTest {
     public static <T> List<Set<T>> partition(T... values) {
         List<Set<T>> partition = new ArrayList<>();
         Set set = new HashSet();
-        for (Object value: values) {
+        for (Object value : values) {
             if (value == null) {
                 partition.add(set);
                 set = new HashSet<>();

@@ -1,7 +1,7 @@
 package fr.cvlaminck.hwweather.core.external.providers.weather.darksky.resources;
 
 public class DarkSkyCurrentlyData
-    extends DarkSkyData {
+        extends DarkSkyData {
     private double temperature;
     private double apparentTemperature;
     private int nearestStormDistance;

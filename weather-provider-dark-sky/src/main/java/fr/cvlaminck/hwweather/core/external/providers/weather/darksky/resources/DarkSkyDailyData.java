@@ -32,7 +32,7 @@ public class DarkSkyDailyData {
     }
 
     public static class Data
-        extends DarkSkyData {
+            extends DarkSkyData {
         private long sunriseTime;
         private long sunsetTime;
         private double moonPhase;

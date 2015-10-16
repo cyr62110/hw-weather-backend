@@ -7,7 +7,7 @@ import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
 
 public class SearchCityRequest
-    extends HwWeatherRequest<SearchCityResponse> {
+        extends HwWeatherRequest<SearchCityResponse> {
 
     private String city;
 

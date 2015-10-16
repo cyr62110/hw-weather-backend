@@ -5,14 +5,15 @@ import fr.cvlaminck.hwweather.core.external.model.weather.*;
 import fr.cvlaminck.hwweather.core.external.model.weather.enums.TemperatureUnit;
 import fr.cvlaminck.hwweather.core.external.providers.weather.WeatherDataProvider;
 import fr.cvlaminck.hwweather.core.external.providers.weather.darksky.resources.*;
-import org.springframework.stereotype.Component;
 import retrofit.RestAdapter;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class DarkSkyWeatherForecastUpdater {
 
@@ -103,6 +104,6 @@ public class DarkSkyWeatherForecastUpdater {
     }
 
     private String getApiKey() {
-        return "31bc40bc737612697c579145c96591e5"; //FIXME Remove before pushing to GitHub
+        return "fb2a0e34851fe8f2fe36468b9eb94f6e"; //FIXME Remove before pushing to GitHub
     }
 }

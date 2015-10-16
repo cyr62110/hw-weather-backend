@@ -43,7 +43,7 @@ public class CityManager {
 
     private CityEntity getOrImportCityWithExternalId(CityExternalIdEntity externalId, String languageCode) throws DataProviderException, NoProviderWithNameException {
         CityEntity city = cityRepository.findByExternalId(externalId);
-        if(city == null) {
+        if (city == null) {
             city = importCityWithExternalId(externalId, languageCode);
         }
         return city;

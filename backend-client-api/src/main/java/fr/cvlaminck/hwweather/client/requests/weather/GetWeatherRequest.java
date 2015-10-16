@@ -2,7 +2,6 @@ package fr.cvlaminck.hwweather.client.requests.weather;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
-import fr.cvlaminck.builders.uri.UriBuilder;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
 import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
@@ -13,7 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class GetWeatherRequest
-    extends HwWeatherRequest<WeatherResponse> {
+        extends HwWeatherRequest<WeatherResponse> {
 
     private ExternalCityIdResource externalCityId;
     private String cityId;

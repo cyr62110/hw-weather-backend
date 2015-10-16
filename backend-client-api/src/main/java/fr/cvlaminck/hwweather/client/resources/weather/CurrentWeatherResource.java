@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.client.resources.weather;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.TemperatureUnit;
 
 public class CurrentWeatherResource
-    extends AbstractWeatherResource {
+        extends AbstractWeatherResource {
     private double temperatureInCelsius;
 
     public double getTemperature(TemperatureUnit unit) {

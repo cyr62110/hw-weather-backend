@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * by Albert Nijenhuis and Herbert S. Wilf.
  */
 public class KSubsetOfNSetIterator<T>
-    implements Iterator<Set<T>> {
+        implements Iterator<Set<T>> {
 
     private List<T> sourceSet;
 
@@ -57,6 +57,7 @@ public class KSubsetOfNSetIterator<T>
 
     private int m2;
     private int h;
+
     private boolean nexksb(int n, int k, Integer[] a, boolean mtc) {
         if (!mtc) {
             m2 = 0;

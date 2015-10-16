@@ -7,7 +7,6 @@ import fr.cvlaminck.hwweather.core.model.RefreshPlan;
 import fr.cvlaminck.hwweather.core.model.WeatherProvidersSelectionResult;
 import fr.cvlaminck.hwweather.core.utils.iterators.PartitionOfSetIteratorTest;
 import fr.cvlaminck.hwweather.data.model.FreeCallCountersEntity;
-import fr.cvlaminck.hwweather.data.model.WeatherDataType;
 import fr.cvlaminck.hwweather.data.repositories.FreeCallCountersRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,8 +102,8 @@ public class WeatherDataProviderSelectionManagerTest {
 
         partition = PartitionOfSetIteratorTest.partition(ExternalWeatherDataType.HOURLY, ExternalWeatherDataType.DAILY, null, ExternalWeatherDataType.CURRENT);
         plans = manager.buildRefreshPlansForPartition(typesToRefresh, partition, map).stream()
-            .map((p) -> p.getProvidersToUse())
-            .collect(Collectors.toList());
+                .map((p) -> p.getProvidersToUse())
+                .collect(Collectors.toList());
 
         assertEquals(2, plans.size());
         assertTrue(plans.contains(providerSet(HD, C)));
@@ -177,7 +176,7 @@ public class WeatherDataProviderSelectionManagerTest {
     }
 
     @Test
-     public void testSelectDataProvidersToUseForRefreshOperation() throws Exception {
+    public void testSelectDataProvidersToUseForRefreshOperation() throws Exception {
         WeatherDataProviderSelectionManager manager = new WeatherDataProviderSelectionManager();
 
         FreeCallCountersEntity freeCallsCounters = new FreeCallCountersEntity();
