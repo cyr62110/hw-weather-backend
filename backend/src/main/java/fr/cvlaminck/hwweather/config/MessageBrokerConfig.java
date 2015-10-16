@@ -7,22 +7,42 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MessageBrokerConfig {
 
+    @Value("${amqp.host:}")
+    private String amqpServerHost;
+
+    @Value("${amqp.user:}")
+    private String amqpServerUsername;
+
+    @Value("${amqp.password:}")
+    private String amqpServerPassword;
+
+    @Value("${amqp.virtualhost:}")
+    private String amqpServerVirtualHost;
+
     @Bean
     public ConnectionFactory messageBrokerConnectionFactory() {
-        CachingConnectionFactory connectionFactory = new CachingConnectionFactory("owl.rmq.cloudamqp.com");
-        connectionFactory.setUsername("sihbhphn");
-        connectionFactory.setPassword("qPRcVb1gwcXmaEuwYmT1FPvTQIsb2J1l");
-        connectionFactory.setVirtualHost("sihbhphn");
+        CachingConnectionFactory connectionFactory = new CachingConnectionFactory(amqpServerHost);
+
+        if (amqpServerUsername.length() > 0) {
+            connectionFactory.setUsername(amqpServerUsername);
+            if (amqpServerPassword.length() > 0) {
+                connectionFactory.setPassword(amqpServerPassword);
+            }
+        }
+
+        if (amqpServerVirtualHost.length() > 0) {
+            connectionFactory.setVirtualHost(amqpServerVirtualHost);
+        }
         return connectionFactory;
     }
 
@@ -51,7 +71,9 @@ public class MessageBrokerConfig {
     }
 
     @Bean
-    public TopicExchange weatherRefreshOperationResultExchange() { return new TopicExchange("weather-refresh-operation-result"); }
+    public TopicExchange weatherRefreshOperationResultExchange() {
+        return new TopicExchange("weather-refresh-operation-result");
+    }
 
     @Bean
     public Queue weatherRefreshOperationQueue() {
