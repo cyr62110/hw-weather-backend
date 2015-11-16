@@ -1,7 +1,10 @@
 allprojects {
     ext {
+        gradleAvroPluginVersion = '0.7.0'
+
         springBootVersion = '1.2.5.RELEASE'
         jacksonVersion = '2.6.2'
+        avroVersion = '1.7.7'
         commonsIoVersion = '2.4'
 
         jUnitVersion = '4.10'
@@ -11,6 +14,9 @@ allprojects {
     buildscript {
         repositories {
             jcenter()
+            maven {
+                url "https://plugins.gradle.org/m2/"
+            }
         }
         dependencies {
             classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'

@@ -1,4 +1,11 @@
+buildscript {
+    dependencies {
+        classpath "com.commercehub.gradle.plugin:gradle-avro-plugin:$gradleAvroPluginVersion"
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'com.commercehub.gradle.plugin.avro'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
@@ -7,6 +14,7 @@ version '0.2'
 
 dependencies {
     compile 'fr.cvlaminck:java-uri-builder:1.2'
+    compile "org.apache.avro:avro:$avroVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "commons-io:commons-io:$commonsIoVersion"
 
