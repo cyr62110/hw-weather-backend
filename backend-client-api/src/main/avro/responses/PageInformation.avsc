@@ -1,0 +1,23 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "PageInformation",
+    "fields": [
+        {
+            "name": "query",
+            "type": "string"
+        },
+        {
+            "name": "totalNumberOfResult",
+            "type": "int"
+        },
+        {
+            "name": "page",
+            "type": "int"
+        },
+        {
+            "name": "numberOfResultPerPage",
+            "type": "int"
+        }
+    ]
+}

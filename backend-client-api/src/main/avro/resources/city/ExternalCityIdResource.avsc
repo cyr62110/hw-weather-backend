@@ -1,0 +1,15 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "ExternalCityIdResource",
+    "fields": [
+        {
+            "name": "provider",
+            "type": "string"
+        },
+        {
+            "name": "id",
+            "type": "string"
+        }
+    ]
+}

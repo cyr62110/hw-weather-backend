@@ -1,8 +1,0 @@
-@namespace("fr.cvlaminck.hwweather.client.protocol")
-protocol HwWeather {
-
-    record City {
-        string id;
-    }
-
-}

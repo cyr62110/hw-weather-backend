@@ -1,0 +1,18 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "SearchCityResponse",
+    "fields": [
+        {
+            "name": "cities",
+            "type": {
+                "type": "array",
+                "items": "CityResource"
+            }
+        },
+        {
+            "name": "page",
+            "type": "PageInformation"
+        }
+    ]
+}
