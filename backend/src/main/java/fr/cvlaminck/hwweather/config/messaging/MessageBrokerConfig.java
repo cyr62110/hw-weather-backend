@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.config;
+package fr.cvlaminck.hwweather.config.messaging;
 
 import fr.cvlaminck.hwweather.core.listeners.WeatherRefreshOperationListener;
 import org.springframework.amqp.core.*;

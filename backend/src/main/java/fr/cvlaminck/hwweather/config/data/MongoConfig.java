@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.config;
+package fr.cvlaminck.hwweather.config.data;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;

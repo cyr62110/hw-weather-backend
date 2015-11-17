@@ -1,6 +1,7 @@
 package fr.cvlaminck.hwweather.front.controllers.user;
 
-import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
+import fr.cvlaminck.hwweather.client.protocol.PageInformation;
+import fr.cvlaminck.hwweather.client.protocol.SearchCityResponse;
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.managers.CityDataProviderManager;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
@@ -28,7 +29,10 @@ public class CityController {
     @Autowired
     private CityDataProviderManager cityDataProviderManager;
 
-    @RequestMapping("/search/{name}")
+    @RequestMapping(
+            value = "/search/{name}",
+            produces = "application/avro+binary"
+    )
     public SearchCityResponse search(@PathVariable String name,
                                      @RequestParam(required = false) Integer page) throws Exception {
         if (page == null || page < 1) {
@@ -38,18 +42,20 @@ public class CityController {
 
         Collection<ExternalCityResource> cities = cityDataProviderManager.searchByName(name);
 
-        SearchCityResponse response = new SearchCityResponse();
-        response.setQuery(name);
-        response.setPage(page);
-        response.setNumberOfResultPerPage(numberOfResultsPerPage);
-        response.setTotalNumberOfResult(cities.size());
-        response.setResults(cities.stream()
-                        .skip((page - 1) * numberOfResultsPerPage)
-                        .limit(numberOfResultsPerPage)
-                        .map(c -> cityConverter.getResourceFrom(c))
-                        .collect(Collectors.toList())
-        );
-        return response;
+        PageInformation.Builder pageInfoBuilder = PageInformation.newBuilder();
+        pageInfoBuilder.setQuery(name);
+        pageInfoBuilder.setPage(page);
+        pageInfoBuilder.setNumberOfResultPerPage(numberOfResultsPerPage);
+        pageInfoBuilder.setTotalNumberOfResult(cities.size());
+
+        SearchCityResponse.Builder responseBuilder = SearchCityResponse.newBuilder();
+        responseBuilder.setCities(cities.stream()
+                .skip((page - 1) * numberOfResultsPerPage)
+                .limit(numberOfResultsPerPage)
+                .map(c -> cityConverter.getResourceFrom(c))
+                .collect(Collectors.toList()));
+        responseBuilder.setPage(pageInfoBuilder.build());
+        return responseBuilder.build();
     }
 
     @RequestMapping("/{id}")

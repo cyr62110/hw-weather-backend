@@ -1,7 +1,6 @@
 package fr.cvlaminck.hwweather.front.converters;
 
 import fr.cvlaminck.hwweather.client.resources.CityResource;
-import fr.cvlaminck.hwweather.client.resources.ExternalCityIdResource;
 import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import org.springframework.stereotype.Component;
@@ -20,17 +19,18 @@ public class CityConverter {
         return resource;
     }
 
-    public CityResource getResourceFrom(ExternalCityResource external) {
-        ExternalCityIdResource id = new ExternalCityIdResource();
-        id.setProvider(external.getProvider());
-        id.setId(external.getExternalId());
+    public fr.cvlaminck.hwweather.client.protocol.CityResource getResourceFrom(ExternalCityResource external) {
+        fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource.Builder externalIdBuilder = fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource.newBuilder();
+        externalIdBuilder.setProvider(external.getProvider());
+        externalIdBuilder.setId(external.getExternalId());
 
-        CityResource resource = new CityResource();
-        resource.setExternalId(id);
-        resource.setName(external.getName());
-        resource.setCountry(external.getCountry());
+        fr.cvlaminck.hwweather.client.protocol.CityResource.Builder resourceBuilder = fr.cvlaminck.hwweather.client.protocol.CityResource.newBuilder();
+        resourceBuilder.setId(null);
+        resourceBuilder.setExternalId(externalIdBuilder.build());
+        resourceBuilder.setName(external.getName());
+        resourceBuilder.setCountry(external.getCountry());
 
-        return resource;
+        return resourceBuilder.build();
     }
 
 }
