@@ -7,6 +7,7 @@ import fr.cvlaminck.hwweather.core.managers.CityDataProviderManager;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.front.converters.CityConverter;
+import fr.cvlaminck.hwweather.front.utils.AvroMimeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +32,10 @@ public class CityController {
 
     @RequestMapping(
             value = "/search/{name}",
-            produces = "application/avro+binary"
+            produces = {
+                    AvroMimeTypes.BINARY_AVRO_MIME,
+                    AvroMimeTypes.JSON_AVRO_MIME
+            }
     )
     public SearchCityResponse search(@PathVariable String name,
                                      @RequestParam(required = false) Integer page) throws Exception {
