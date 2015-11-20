@@ -10,7 +10,7 @@ public class HwWeatherServerException
         super(MESSAGE, requestUrl, null, statusCode);
     }
 
-    public HwWeatherServerException(URL requestUrl, String requestContent, int statusCode) {
+    public HwWeatherServerException(URL requestUrl, byte[] requestContent, int statusCode) {
         super(MESSAGE, requestUrl, requestContent, statusCode);
     }
 }

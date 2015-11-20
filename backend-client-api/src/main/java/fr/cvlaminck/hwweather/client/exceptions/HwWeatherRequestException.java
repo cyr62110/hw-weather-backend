@@ -6,10 +6,10 @@ public abstract class HwWeatherRequestException
         extends Exception {
 
     private URL requestUrl;
-    private String requestContent;
+    private byte[] requestContent;
     private int statusCode;
 
-    protected HwWeatherRequestException(String message, URL requestUrl, String requestContent, int statusCode) {
+    protected HwWeatherRequestException(String message, URL requestUrl, byte[] requestContent, int statusCode) {
         super(message);
 
         this.requestUrl = requestUrl;
@@ -21,7 +21,7 @@ public abstract class HwWeatherRequestException
         return requestUrl;
     }
 
-    public String getRequestContent() {
+    public byte[] getRequestContent() {
         return requestContent;
     }
 

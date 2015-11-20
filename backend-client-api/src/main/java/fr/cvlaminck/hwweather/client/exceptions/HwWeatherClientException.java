@@ -9,11 +9,11 @@ public class HwWeatherClientException
         extends HwWeatherRequestException {
     public static final String MESSAGE = "Server responded with code '%d' to the request. ";
 
-    public HwWeatherClientException(URL requestUrl, String requestContent, int statusCode) {
+    public HwWeatherClientException(URL requestUrl, byte[] requestContent, int statusCode) {
         super(String.format(MESSAGE, statusCode), requestUrl, requestContent, statusCode);
     }
 
-    public HwWeatherClientException(URL requestUrl, String requestContent, int statusCode, String details) {
+    public HwWeatherClientException(URL requestUrl, byte[] requestContent, int statusCode, String details) {
         super(String.format(MESSAGE, statusCode) + details, requestUrl, requestContent, statusCode);
     }
 }

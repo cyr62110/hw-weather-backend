@@ -8,10 +8,21 @@ import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolExceptio
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherServerException;
 import fr.cvlaminck.hwweather.client.reponses.ClientErrorResponse;
+import fr.cvlaminck.hwweather.client.utils.HwWeatherAvroMimeTypes;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericDatumReader;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.DatumReader;
+import org.apache.avro.io.Decoder;
+import org.apache.avro.io.DecoderFactory;
+import org.apache.avro.reflect.ReflectData;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
@@ -53,16 +64,20 @@ public abstract class HwWeatherRequest<T>
                 urlConnection = (HttpURLConnection) url.openConnection(proxy);
             }
 
+
+
             urlConnection.setRequestMethod(getRequestMethod());
-            String requestContent = getRequestContent();
-            if (requestContent != null && !requestContent.isEmpty()) {
+            byte[] requestContent = getRequestContent();
+            if (requestContent != null && requestContent.length > 0) {
                 urlConnection.setDoOutput(true);
-                IOUtils.write(requestContent, urlConnection.getOutputStream());
+                writeRequestContent(urlConnection.getOutputStream());
             }
 
             int responseCode = urlConnection.getResponseCode();
             Map<String, List<String>> responseHeaders = urlConnection.getHeaderFields();
-            String responseContent = getResponseContent(urlConnection, responseCode, responseHeaders);
+            byte[] responseContent = getResponseContent(urlConnection, responseCode, responseHeaders);
+
+            // FIXME Check the headers: verify that we have received binary avro, etc.
 
             if (responseCode == 200) {
                 response = getResponse(responseContent, responseHeaders);
@@ -94,39 +109,67 @@ public abstract class HwWeatherRequest<T>
         return "GET";
     }
 
-    protected String getRequestContent() throws HwWeatherIllegalProtocolException {
+    private void appendRequestHeaders(HttpURLConnection urlConnection) {
+        // We want to receive only binary avro from the server
+        urlConnection.setRequestProperty("Accept", HwWeatherAvroMimeTypes.BINARY_AVRO);
+
+        Map<String, String> additionalRequestHeaders = getAdditionalRequestHeaders();
+        if (additionalRequestHeaders != null && !additionalRequestHeaders.isEmpty()) {
+            //FIXME Filter headers that are set internally by this Request builder.
+            for (Map.Entry<String, String> entry : additionalRequestHeaders.entrySet()) {
+                urlConnection.setRequestProperty(entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
+    protected Map<String, String> getAdditionalRequestHeaders() {
         return null;
     }
 
-    private String getResponseContent(HttpURLConnection urlConnection, int responseCode, Map<String, List<String>> responseHeaders) throws IOException {
+    protected byte[] getRequestContent() throws HwWeatherIllegalProtocolException, IOException {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        writeRequestContent(bos);
+        return bos.toByteArray();
+    }
+
+    protected void writeRequestContent(OutputStream outputStream) throws HwWeatherIllegalProtocolException, IOException {
+
+    }
+
+    private byte[] getResponseContent(HttpURLConnection urlConnection, int responseCode, Map<String, List<String>> responseHeaders) throws IOException {
         InputStream is = null;
         try {
             is = urlConnection.getInputStream();
             //TODO: Handle Gzip compression, etc...
-            return IOUtils.toString(is, Charset.forName("UTF-8"));
+            return IOUtils.toByteArray(is);
         } finally {
             IOUtils.closeQuietly(is);
         }
     }
 
-    protected void handleServerError(URL requestUrl, String requestContent,
-                                     int responseCode, String responseContent, Map<String, List<String>> responseHeaders)
+    protected void handleServerError(URL requestUrl, byte[] requestContent,
+                                     int responseCode, byte[] responseContent, Map<String, List<String>> responseHeaders)
             throws HwWeatherServerException {
         throw new HwWeatherServerException(requestUrl, requestContent, responseCode);
     }
 
-    protected void handleClientError(URL requestUrl, String requestContent,
-                                     int responseCode, String responseContent, Map<String, List<String>> responseHeaders)
+    protected void handleClientError(URL requestUrl, byte[] requestContent,
+                                     int responseCode, byte[] responseContent, Map<String, List<String>> responseHeaders)
             throws HwWeatherClientException, IOException {
-        if (responseContent == null || responseContent.isEmpty()) {
+        if (responseContent == null || responseContent.length == 0) {
             throw new HwWeatherClientException(requestUrl, requestContent, responseCode);
         }
-        ClientErrorResponse response = objectMapper.readValue(responseContent, ClientErrorResponse.class);
-        throw new HwWeatherClientException(requestUrl, requestContent, responseCode, response.getMessage());
+        //FIXME ClientErrorResponse response = objectMapper.readValue(responseContent, ClientErrorResponse.class);
+        throw new HwWeatherClientException(requestUrl, requestContent, responseCode, /*response.getMessage()*/ null);
     }
 
-    protected T getResponse(String responseContent, Map<String, List<String>> responseHeaders) throws IOException {
-        return objectMapper.readValue(responseContent, responseClass);
+    protected T getResponse(byte[] responseContent, Map<String, List<String>> responseHeaders) throws IOException {
+        // FIXME Create a poll to reuse decoder
+        Decoder decoder = DecoderFactory.get().binaryDecoder(responseContent, null);
+
+        // FIXME Reader and writer schema are the same, should we use a constructor with reader and writer schema and get schema from the response?
+        DatumReader<T> reader = new SpecificDatumReader<T>(responseClass);
+        return reader.read(null, decoder);
     }
 
     public void setProxy(Proxy proxy) {

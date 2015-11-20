@@ -1,7 +1,7 @@
 package fr.cvlaminck.hwweather.client;
 
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
-import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
+import fr.cvlaminck.hwweather.client.protocol.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.city.SearchCityRequest;
 
 import java.io.IOException;

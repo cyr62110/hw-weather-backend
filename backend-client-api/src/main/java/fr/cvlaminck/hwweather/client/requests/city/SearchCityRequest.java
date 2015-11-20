@@ -3,7 +3,7 @@ package fr.cvlaminck.hwweather.client.requests.city;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
-import fr.cvlaminck.hwweather.client.reponses.city.SearchCityResponse;
+import fr.cvlaminck.hwweather.client.protocol.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
 
 public class SearchCityRequest
