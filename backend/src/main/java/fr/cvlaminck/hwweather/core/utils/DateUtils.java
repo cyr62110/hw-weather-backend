@@ -3,6 +3,7 @@ package fr.cvlaminck.hwweather.core.utils;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 public final class DateUtils {
 
@@ -29,4 +30,11 @@ public final class DateUtils {
         return LocalDateTime.now(defaultZone());
     }
 
+    public static long nowTimestamp() {
+        return toTimestamp(now());
+    }
+
+    public static long toTimestamp(LocalDateTime dateTime) {
+        return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+    }
 }

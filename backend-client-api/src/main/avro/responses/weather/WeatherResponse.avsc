@@ -1,0 +1,35 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "WeatherResponse",
+    "fields": [
+        {
+            "name": "city",
+            "type": "CityResource"
+        },
+        {
+            "name": "current",
+            "type": ["CurrentWeatherResource", "null"]
+        },
+        {
+            "name": "hourly",
+            "type": [
+                {
+                    "type": "array",
+                    "items": "HourlyForecastResource"
+                },
+                "null"
+            ]
+        },
+        {
+            "name": "daily",
+            "type": [
+                {
+                    "type": "array",
+                    "items": "DailyForecastResource"
+                },
+                "null"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,23 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "ClientErrorResponse",
+    "fields": [
+        {
+            "name": "timestamp",
+            "type": "long"
+        },
+        {
+            "name": "status",
+            "type": "int"
+        },
+        {
+            "name": "error",
+            "type": ["string", "null"]
+        },
+        {
+            "name": "message",
+            "type": ["string", "null"]
+        }
+    ]
+}

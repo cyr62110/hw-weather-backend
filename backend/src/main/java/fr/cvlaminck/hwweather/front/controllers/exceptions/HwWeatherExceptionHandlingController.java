@@ -1,13 +1,15 @@
 package fr.cvlaminck.hwweather.front.controllers.exceptions;
 
-import fr.cvlaminck.hwweather.client.reponses.ClientErrorResponse;
+import fr.cvlaminck.hwweather.client.protocol.ClientErrorResponse;
 import fr.cvlaminck.hwweather.core.exceptions.HwWeatherCoreException;
 import fr.cvlaminck.hwweather.core.exceptions.clients.HwWeatherCoreClientException;
+import fr.cvlaminck.hwweather.core.utils.DateUtils;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.ZoneOffset;
 
 @ControllerAdvice
 public class HwWeatherExceptionHandlingController {
@@ -22,10 +24,11 @@ public class HwWeatherExceptionHandlingController {
     public ClientErrorResponse handleCoreClientException(HwWeatherCoreClientException ex, HttpServletResponse httpResponse) {
         httpResponse.setStatus(ex.getResponseCode());
 
-        ClientErrorResponse response = new ClientErrorResponse();
-        response.setStatus(ex.getResponseCode());
-        response.setMessage(ex.getMessage());
-        return response;
+        ClientErrorResponse.Builder responseBuilder = ClientErrorResponse.newBuilder();
+        responseBuilder.setTimestamp(DateUtils.nowTimestamp());
+        responseBuilder.setStatus(ex.getResponseCode());
+        responseBuilder.setMessage(ex.getMessage());
+        return responseBuilder.build();
     }
 
 }

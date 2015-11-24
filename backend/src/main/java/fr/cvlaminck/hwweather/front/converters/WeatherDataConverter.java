@@ -1,9 +1,10 @@
 package fr.cvlaminck.hwweather.front.converters;
 
-import fr.cvlaminck.hwweather.client.resources.weather.CurrentWeatherResource;
-import fr.cvlaminck.hwweather.client.resources.weather.DailyForecastResource;
-import fr.cvlaminck.hwweather.client.resources.weather.HourlyForecastResource;
-import fr.cvlaminck.hwweather.client.resources.weather.WeatherConditionResource;
+import fr.cvlaminck.hwweather.client.protocol.CurrentWeatherResource;
+import fr.cvlaminck.hwweather.client.protocol.DailyForecastResource;
+import fr.cvlaminck.hwweather.client.protocol.HourlyForecastResource;
+import fr.cvlaminck.hwweather.client.protocol.WeatherConditionResource;
+import fr.cvlaminck.hwweather.core.utils.DateUtils;
 import fr.cvlaminck.hwweather.data.model.weather.CurrentWeatherEntity;
 import fr.cvlaminck.hwweather.data.model.weather.DailyForecastEntity;
 import fr.cvlaminck.hwweather.data.model.weather.HourlyForecastEntity;
@@ -16,34 +17,34 @@ import java.time.ZoneOffset;
 public class WeatherDataConverter {
 
     public CurrentWeatherResource getResourceFrom(CurrentWeatherEntity entity) {
-        CurrentWeatherResource resource = new CurrentWeatherResource();
-        resource.setDate(entity.getRefreshTime().toInstant(ZoneOffset.UTC).toEpochMilli());
-        resource.setTemperatureInCelsius(entity.getTemperatureInCelsius());
-        resource.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
-        return resource;
+        CurrentWeatherResource.Builder resourceBuilder = CurrentWeatherResource.newBuilder();
+        resourceBuilder.setDate(DateUtils.toTimestamp(entity.getRefreshTime()));
+        resourceBuilder.setTemperatureInCelsius(entity.getTemperatureInCelsius());
+        resourceBuilder.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
+        return resourceBuilder.build();
     }
 
     public HourlyForecastResource getResourceFrom(HourlyForecastEntity.ByHourForecast entity) {
-        HourlyForecastResource resource = new HourlyForecastResource();
-        resource.setDate(entity.getHour().toInstant(ZoneOffset.UTC).toEpochMilli());
-        resource.setTemperatureInCelsius(entity.getTemperatureInCelsius());
-        resource.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
-        return resource;
+        HourlyForecastResource.Builder resourceBuilder = HourlyForecastResource.newBuilder();
+        resourceBuilder.setDate(DateUtils.toTimestamp(entity.getHour()));
+        resourceBuilder.setTemperatureInCelsius(entity.getTemperatureInCelsius());
+        resourceBuilder.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
+        return resourceBuilder.build();
     }
 
     public DailyForecastResource getResourceFrom(DailyForecastEntity.ByDayForecast entity) {
-        DailyForecastResource resource = new DailyForecastResource();
-        resource.setDate(entity.getDay().atTime(0, 0).toInstant(ZoneOffset.UTC).toEpochMilli());
-        resource.setMinTemperatureInCelsius(entity.getMinTemperatureInCelsius());
-        resource.setMaxTemperatureInCelsius(entity.getMaxTemperatureInCelsius());
-        resource.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
-        return resource;
+        DailyForecastResource.Builder resourceBuilder = DailyForecastResource.newBuilder();
+        resourceBuilder.setDate(DateUtils.toTimestamp(entity.getDay().atTime(0, 0)));
+        resourceBuilder.setMinTemperatureInCelsius(entity.getMinTemperatureInCelsius());
+        resourceBuilder.setMaxTemperatureInCelsius(entity.getMaxTemperatureInCelsius());
+        resourceBuilder.setWeatherCondition(getResourceFrom(entity.getWeatherCondition()));
+        return resourceBuilder.build();
     }
 
     public WeatherConditionResource getResourceFrom(WeatherConditionEntity entity) {
-        WeatherConditionResource resource = new WeatherConditionResource();
+        WeatherConditionResource.Builder resourceBuilder = WeatherConditionResource.newBuilder();
         //FIXME Implements weather condition
-        return resource;
+        return resourceBuilder.build();
     }
 
 }

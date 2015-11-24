@@ -1,0 +1,23 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "DailyForecastResource",
+    "fields": [
+        {
+            "name": "minTemperatureInCelsius",
+            "type": "double"
+        },
+        {
+            "name": "maxTemperatureInCelsius",
+            "type": "double"
+        },
+        {
+            "name": "weatherCondition",
+            "type": "WeatherConditionResource"
+        },
+        {
+            "name": "date",
+            "type": "long"
+        }
+    ]
+}

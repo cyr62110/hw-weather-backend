@@ -7,15 +7,11 @@ import fr.cvlaminck.hwweather.client.exceptions.HwWeatherClientException;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherServerException;
-import fr.cvlaminck.hwweather.client.reponses.ClientErrorResponse;
+import fr.cvlaminck.hwweather.client.protocol.ClientErrorResponse;
 import fr.cvlaminck.hwweather.client.utils.HwWeatherAvroMimeTypes;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericDatumReader;
-import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.reflect.ReflectData;
 import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.commons.io.IOUtils;
 
@@ -26,7 +22,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -80,7 +75,7 @@ public abstract class HwWeatherRequest<T>
             // FIXME Check the headers: verify that we have received binary avro, etc.
 
             if (responseCode == 200) {
-                response = getResponse(responseContent, responseHeaders);
+                response = getResponse(responseClass, responseContent, responseHeaders);
             } else {
                 switch (responseCode / 100) {
                     case 1:
@@ -159,11 +154,11 @@ public abstract class HwWeatherRequest<T>
         if (responseContent == null || responseContent.length == 0) {
             throw new HwWeatherClientException(requestUrl, requestContent, responseCode);
         }
-        //FIXME ClientErrorResponse response = objectMapper.readValue(responseContent, ClientErrorResponse.class);
-        throw new HwWeatherClientException(requestUrl, requestContent, responseCode, /*response.getMessage()*/ null);
+        ClientErrorResponse response = getResponse(ClientErrorResponse.class, responseContent, responseHeaders);
+        throw new HwWeatherClientException(requestUrl, requestContent, responseCode, response.getMessage());
     }
 
-    protected T getResponse(byte[] responseContent, Map<String, List<String>> responseHeaders) throws IOException {
+    protected <T> T getResponse(Class<T> responseClass, byte[] responseContent, Map<String, List<String>> responseHeaders) throws IOException {
         // FIXME Create a poll to reuse decoder
         Decoder decoder = DecoderFactory.get().binaryDecoder(responseContent, null);
 

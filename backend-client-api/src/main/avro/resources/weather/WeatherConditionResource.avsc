@@ -1,0 +1,11 @@
+{
+    "namespace": "fr.cvlaminck.hwweather.client.protocol",
+    "type": "record",
+    "name": "WeatherConditionResource",
+    "fields": [
+        {
+            "name": "todo",
+            "type": ["string", "null"]
+        }
+    ]
+}

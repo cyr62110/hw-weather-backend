@@ -3,9 +3,9 @@ package fr.cvlaminck.hwweather.client.requests.weather;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
-import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
+import fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource;
+import fr.cvlaminck.hwweather.client.protocol.WeatherResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
-import fr.cvlaminck.hwweather.client.resources.ExternalCityIdResource;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
 
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class GetWeatherRequest
         if (cityId != null && cityId.isEmpty()) {
             throw new HwWeatherIllegalProtocolException("You must provide a non empty city id.");
         }
-        if (externalCityId != null && !externalCityId.isValid()) {
+        if (externalCityId != null && !isValidExternalCityId(externalCityId)) {
             throw new HwWeatherIllegalProtocolException("You must provide a valid external id: Both provider and id filled.");
         }
 
@@ -65,6 +65,19 @@ public class GetWeatherRequest
                 .appendPathSegment(cityId)
                 .appendPathSegment(typesToPathSegment(types))
                 .build();
+    }
+
+    private boolean isValidExternalCityId(ExternalCityIdResource externalCityId) {
+        if (externalCityId == null) {
+            return false;
+        }
+        if (externalCityId.getId() == null || externalCityId.getId().length() == 0){
+            return false;
+        }
+        if (externalCityId.getProvider() == null || externalCityId.getProvider().length() == 0) {
+            return false;
+        }
+        return true;
     }
 
     private String typesToPathSegment(Collection<WeatherDataType> types) {

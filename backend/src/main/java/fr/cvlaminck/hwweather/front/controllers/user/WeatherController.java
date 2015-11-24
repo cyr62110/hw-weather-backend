@@ -1,6 +1,6 @@
 package fr.cvlaminck.hwweather.front.controllers.user;
 
-import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
+import fr.cvlaminck.hwweather.client.protocol.WeatherResponse;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
 import fr.cvlaminck.hwweather.core.exceptions.HwWeatherCoreException;
 import fr.cvlaminck.hwweather.core.managers.CityManager;

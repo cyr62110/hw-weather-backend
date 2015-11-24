@@ -1,9 +1,9 @@
 package fr.cvlaminck.hwweather.client;
 
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
-import fr.cvlaminck.hwweather.client.reponses.weather.WeatherResponse;
+import fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource;
+import fr.cvlaminck.hwweather.client.protocol.WeatherResponse;
 import fr.cvlaminck.hwweather.client.requests.weather.GetWeatherRequest;
-import fr.cvlaminck.hwweather.client.resources.ExternalCityIdResource;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
 
 import java.io.IOException;
