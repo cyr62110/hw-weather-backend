@@ -5,11 +5,13 @@
     "fields": [
         {
             "name": "id",
-            "type": ["null", "string"]
+            "type": ["null", "string"],
+            "default": null
         },
         {
             "name": "externalId",
-            "type": ["null", "ExternalCityIdResource"]
+            "type": ["null", "ExternalCityIdResource"],
+            "default": null
         },
         {
             "name": "name",

@@ -9,27 +9,30 @@
         },
         {
             "name": "current",
-            "type": ["CurrentWeatherResource", "null"]
+            "type": ["null", "CurrentWeatherResource"],
+            "default": null
         },
         {
             "name": "hourly",
             "type": [
+                "null",
                 {
                     "type": "array",
                     "items": "HourlyForecastResource"
-                },
-                "null"
-            ]
+                }
+            ],
+            "default": null
         },
         {
             "name": "daily",
             "type": [
+                "null",
                 {
                     "type": "array",
                     "items": "DailyForecastResource"
-                },
-                "null"
-            ]
+                }
+            ],
+            "default": null
         }
     ]
 }
