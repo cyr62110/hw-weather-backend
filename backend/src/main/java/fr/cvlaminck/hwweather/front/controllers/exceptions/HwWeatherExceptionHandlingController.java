@@ -4,6 +4,7 @@ import fr.cvlaminck.hwweather.client.protocol.ClientErrorResponse;
 import fr.cvlaminck.hwweather.core.exceptions.HwWeatherCoreException;
 import fr.cvlaminck.hwweather.core.exceptions.clients.HwWeatherCoreClientException;
 import fr.cvlaminck.hwweather.core.utils.DateUtils;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,6 +17,8 @@ public class HwWeatherExceptionHandlingController {
 
     @ExceptionHandler(HwWeatherCoreException.class)
     public void handleCoreException(HwWeatherCoreException ex, HttpServletResponse httpResponse) {
+        ex.printStackTrace(); //FIXME Find a better way to log the error
+
         httpResponse.setStatus(500);
     }
 

@@ -12,6 +12,7 @@ import fr.cvlaminck.hwweather.front.converters.CityConverter;
 import fr.cvlaminck.hwweather.front.converters.WeatherDataConverter;
 import fr.cvlaminck.hwweather.front.exceptions.MissingTypeException;
 import fr.cvlaminck.hwweather.front.exceptions.UnknownTypeException;
+import fr.cvlaminck.hwweather.front.utils.AvroMimeTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,7 +45,14 @@ public class WeatherController {
 
     //TODO Respond Forbidden on /weather, force clients to give types they want to refresh
 
-    @RequestMapping(method = RequestMethod.GET, value = "/{sTypes}")
+    @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/{sTypes}",
+            produces = {
+                    AvroMimeTypes.BINARY_AVRO_MIME,
+                    AvroMimeTypes.JSON_AVRO_MIME
+            }
+    )
     public WeatherResponse getTypes(@PathVariable String cityId,
                                     @PathVariable String sTypes,
                                     HttpServletResponse response)
