@@ -1,3 +1,8 @@
+# Default configuration for Spring, must be copied in the final configuration
+spring.http:
+    gzip: enabled
+
+# Configuration for external server credentials, values must be replaced in the final configuration
 mongo:
   host: localhost
   port: 27017

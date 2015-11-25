@@ -3,6 +3,8 @@ allprojects {
         gradleAvroPluginVersion = '0.7.0'
 
         springBootVersion = '1.2.7.RELEASE'
+        jettyVersion = '9.2.13.v20150730' // Update jetty version when you update spring boot
+
         jacksonVersion = '2.6.2'
         avroVersion = '1.7.7'
         commonsIoVersion = '2.4'
