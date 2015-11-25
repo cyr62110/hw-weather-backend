@@ -4,6 +4,6 @@ sourceCompatibility = 1.8
 version = '1.0'
 
 dependencies {
-    compile 'fr.cvlaminck:java-nominatim:0.4'
+    compile 'fr.cvlaminck:java-nominatim:0.5'
     compile project(':backend-internal-api')
 }
