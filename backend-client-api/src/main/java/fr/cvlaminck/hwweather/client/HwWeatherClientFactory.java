@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.Builder;
 import fr.cvlaminck.builders.exception.MalformedUriException;
 import fr.cvlaminck.builders.uri.Uri;
+import fr.cvlaminck.hwweather.client.schema.HwWeatherAvroSchemaStore;
+import fr.cvlaminck.hwweather.client.schema.HwWeatherInMemoryAvroSchemaStore;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +18,8 @@ public class HwWeatherClientFactory
     private ObjectMapper objectMapper;
 
     private ExecutorService executorService;
+
+    private HwWeatherAvroSchemaStore schemaStore;
 
     public HwWeatherClientFactory baseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -32,10 +36,17 @@ public class HwWeatherClientFactory
         return this;
     }
 
+    public HwWeatherClientFactory schemaStore(HwWeatherAvroSchemaStore schemaStore) {
+        this.schemaStore = schemaStore;
+        return this;
+    }
+
     @Override
     public HwWeatherClient build() {
         HwWeatherClient client = new HwWeatherClient();
         client.setObjectMapper(getObjectMapper());
+        client.setExecutorService(getExecutorService());
+        client.setSchemaStore(getSchemaStore());
 
         try {
             client.setBaseUri(Uri.parse(baseUrl));
@@ -60,5 +71,13 @@ public class HwWeatherClientFactory
             executorService = Executors.newFixedThreadPool(10); //TODO make this number configurable
         }
         return executorService;
+    }
+
+    public HwWeatherAvroSchemaStore getSchemaStore() {
+        HwWeatherAvroSchemaStore schemaStore = this.schemaStore;
+        if (schemaStore == null) {
+            schemaStore = new HwWeatherInMemoryAvroSchemaStore();
+        }
+        return schemaStore;
     }
 }

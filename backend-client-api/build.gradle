@@ -17,6 +17,7 @@ dependencies {
     compile "org.apache.avro:avro:$avroVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
     compile "commons-io:commons-io:$commonsIoVersion"
+    compile "commons-codec:commons-codec:$commonsCodecVersion"
 
     testCompile "junit:junit:$jUnitVersion"
     testCompile "org.mockito:mockito-all:$mockitoVersion"

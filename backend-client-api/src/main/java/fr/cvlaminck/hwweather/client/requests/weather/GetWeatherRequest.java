@@ -7,6 +7,7 @@ import fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource;
 import fr.cvlaminck.hwweather.client.protocol.WeatherResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
 import fr.cvlaminck.hwweather.client.resources.weather.enums.WeatherDataType;
+import fr.cvlaminck.hwweather.client.schema.HwWeatherAvroSchemaStore;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -19,8 +20,8 @@ public class GetWeatherRequest
 
     private Collection<WeatherDataType> types;
 
-    public GetWeatherRequest(Uri baseUri, ObjectMapper objectMapper) {
-        super(baseUri, objectMapper, WeatherResponse.class);
+    public GetWeatherRequest(Uri baseUri, HwWeatherAvroSchemaStore schemaStore) {
+        super(baseUri, schemaStore, WeatherResponse.class);
     }
 
     public void setCity(String cityId) {
@@ -57,7 +58,7 @@ public class GetWeatherRequest
         if (this.cityId != null) {
             cityId = this.cityId;
         } else {
-            cityId = this.externalCityId.toString();
+            cityId = "[" + this.externalCityId.getProvider() + ":" + this.externalCityId.getId() + "]";
         }
 
         return getBaseUriBuilder()

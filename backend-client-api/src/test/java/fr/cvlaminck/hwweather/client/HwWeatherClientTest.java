@@ -1,6 +1,8 @@
 package fr.cvlaminck.hwweather.client;
 
+import fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource;
 import fr.cvlaminck.hwweather.client.protocol.SearchCityResponse;
+import fr.cvlaminck.hwweather.client.protocol.WeatherResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +31,6 @@ public class HwWeatherClientTest {
 
     @Test
     public void testGetWeather() throws Exception {
-        /* FIXME Broken until ported to Avro
         ExternalCityIdResource city = new ExternalCityIdResource();
         city.setProvider("nominatim");
         city.setId("58404");
@@ -41,6 +42,5 @@ public class HwWeatherClientTest {
         assertFalse(response.getHourly().isEmpty());
         assertFalse(response.getDaily().isEmpty());
         assertEquals("Lille", response.getCity().getName());
-        */
     }
 }

@@ -15,7 +15,7 @@ public class HwWeatherCityRequests {
     }
 
     public SearchCityResponse search(String city) throws IOException, HwWeatherRequestException {
-        SearchCityRequest request = new SearchCityRequest(client.getBaseUri(), client.getObjectMapper());
+        SearchCityRequest request = new SearchCityRequest(client.getBaseUri(), client.getSchemaStore());
         request.setCity(city);
         return request.call();
     }

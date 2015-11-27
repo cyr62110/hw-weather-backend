@@ -13,11 +13,13 @@
         },
         {
             "name": "error",
-            "type": ["string", "null"]
+            "type": ["null", "string"],
+            "default": null
         },
         {
             "name": "message",
-            "type": ["string", "null"]
+            "type": ["null", "string"],
+            "default": null
         }
     ]
 }

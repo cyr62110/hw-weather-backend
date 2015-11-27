@@ -8,7 +8,11 @@ import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolExceptio
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherRequestException;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherServerException;
 import fr.cvlaminck.hwweather.client.protocol.ClientErrorResponse;
+import fr.cvlaminck.hwweather.client.schema.HwWeatherAvroSchemaStore;
 import fr.cvlaminck.hwweather.client.utils.HwWeatherAvroMimeTypes;
+import fr.cvlaminck.hwweather.client.utils.HwWeatherAvroSchemaHelper;
+import fr.cvlaminck.hwweather.client.utils.HwWeatherHttpHeaders;
+import org.apache.avro.Schema;
 import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.DecoderFactory;
@@ -25,6 +29,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.zip.GZIPInputStream;
 
 public abstract class HwWeatherRequest<T>
         implements Callable<T> {
@@ -33,11 +38,11 @@ public abstract class HwWeatherRequest<T>
     private Class<T> responseClass;
     private Proxy proxy;
 
-    private ObjectMapper objectMapper;
+    private HwWeatherAvroSchemaStore schemaStore;
 
-    protected HwWeatherRequest(Uri baseUri, ObjectMapper objectMapper, Class<T> responseClass) {
+    protected HwWeatherRequest(Uri baseUri, HwWeatherAvroSchemaStore schemaStore, Class<T> responseClass) {
         this.baseUri = baseUri;
-        this.objectMapper = objectMapper;
+        this.schemaStore = schemaStore;
         this.responseClass = responseClass;
     }
 
@@ -53,15 +58,16 @@ public abstract class HwWeatherRequest<T>
         HttpURLConnection urlConnection = null;
         try {
             URL url = build().toURI().toURL();
+            Schema expectedResponseSchema = getExpectedResponseSchema();
+
             if (proxy == null) {
                 urlConnection = (HttpURLConnection) url.openConnection();
             } else {
                 urlConnection = (HttpURLConnection) url.openConnection(proxy);
             }
 
-
-
             urlConnection.setRequestMethod(getRequestMethod());
+            appendRequestHeaders(urlConnection, expectedResponseSchema);
             byte[] requestContent = getRequestContent();
             if (requestContent != null && requestContent.length > 0) {
                 urlConnection.setDoOutput(true);
@@ -75,7 +81,8 @@ public abstract class HwWeatherRequest<T>
             // FIXME Check the headers: verify that we have received binary avro, etc.
 
             if (responseCode == 200) {
-                response = getResponse(responseClass, responseContent, responseHeaders);
+                Schema serverSchema = getResponseSchema(expectedResponseSchema, responseHeaders);
+                response = getResponse(responseClass, serverSchema, responseContent, responseHeaders);
             } else {
                 switch (responseCode / 100) {
                     case 1:
@@ -104,9 +111,18 @@ public abstract class HwWeatherRequest<T>
         return "GET";
     }
 
-    private void appendRequestHeaders(HttpURLConnection urlConnection) {
-        // We want to receive only binary avro from the server
+    private Schema getExpectedResponseSchema() {
+        return schemaStore.getSchemaForClass(responseClass);
+    }
+
+    private void appendRequestHeaders(HttpURLConnection urlConnection, Schema expectedResponseSchema) {
+        // We want to receive only binary avro compressed with Gzip from the server
         urlConnection.setRequestProperty("Accept", HwWeatherAvroMimeTypes.BINARY_AVRO);
+        urlConnection.setRequestProperty("Accept-Encoding", "gzip");
+
+        // We append the hash of the schema we are using, the server will not have to send us the schema if it not has been updated
+        String expectedResponseSchemaHash = HwWeatherAvroSchemaHelper.getHash(expectedResponseSchema);
+        urlConnection.setRequestProperty(HwWeatherHttpHeaders.CLIENT_AVRO_SCHEMA_HASH, expectedResponseSchemaHash);
 
         Map<String, String> additionalRequestHeaders = getAdditionalRequestHeaders();
         if (additionalRequestHeaders != null && !additionalRequestHeaders.isEmpty()) {
@@ -135,11 +151,21 @@ public abstract class HwWeatherRequest<T>
         InputStream is = null;
         try {
             is = urlConnection.getInputStream();
-            //TODO: Handle Gzip compression, etc...
+            if (isResponseContentGzipped(responseHeaders)) {
+                is = new GZIPInputStream(is);
+            }
             return IOUtils.toByteArray(is);
         } finally {
             IOUtils.closeQuietly(is);
         }
+    }
+
+    private boolean isResponseContentGzipped(Map<String, List<String>> responseHeaders) {
+        List<String> contentEncodingHeaders = responseHeaders.get("Content-Encoding");
+        if (contentEncodingHeaders == null || contentEncodingHeaders.isEmpty()) {
+            return false;
+        }
+        return "gzip".equals(contentEncodingHeaders.get(0));
     }
 
     protected void handleServerError(URL requestUrl, byte[] requestContent,
@@ -154,16 +180,28 @@ public abstract class HwWeatherRequest<T>
         if (responseContent == null || responseContent.length == 0) {
             throw new HwWeatherClientException(requestUrl, requestContent, responseCode);
         }
-        ClientErrorResponse response = getResponse(ClientErrorResponse.class, responseContent, responseHeaders);
+
+        Schema serverSchema = getResponseSchema(null, responseHeaders);
+        ClientErrorResponse response = getResponse(ClientErrorResponse.class, serverSchema, responseContent, responseHeaders);
         throw new HwWeatherClientException(requestUrl, requestContent, responseCode, response.getMessage());
     }
 
-    protected <T> T getResponse(Class<T> responseClass, byte[] responseContent, Map<String, List<String>> responseHeaders) throws IOException {
+    private Schema getResponseSchema(Schema expectedResponseSchema, Map<String, List<String>> responseHeaders) {
+        List<String> xSchemaHeaders = responseHeaders.get(HwWeatherHttpHeaders.AVRO_SCHEMA);
+        if ((xSchemaHeaders == null || xSchemaHeaders.isEmpty()) && expectedResponseSchema != null) {
+            return expectedResponseSchema;
+        } else {
+            Schema schema = HwWeatherAvroSchemaHelper.decodeSchema(xSchemaHeaders.get(0));
+            return schema;
+        }
+    }
+
+    protected <T> T getResponse(Class<T> responseClass, Schema serverSchema, byte[] responseContent, Map<String, List<String>> responseHeaders) throws IOException {
         // FIXME Create a poll to reuse decoder
         Decoder decoder = DecoderFactory.get().binaryDecoder(responseContent, null);
 
-        // FIXME Reader and writer schema are the same, should we use a constructor with reader and writer schema and get schema from the response?
-        DatumReader<T> reader = new SpecificDatumReader<T>(responseClass);
+        Schema readerSchema = HwWeatherAvroSchemaHelper.getSchemaForClass(responseClass);
+        DatumReader<T> reader = new SpecificDatumReader<T>(readerSchema, serverSchema);
         return reader.read(null, decoder);
     }
 

@@ -5,14 +5,15 @@ import fr.cvlaminck.builders.uri.Uri;
 import fr.cvlaminck.hwweather.client.exceptions.HwWeatherIllegalProtocolException;
 import fr.cvlaminck.hwweather.client.protocol.SearchCityResponse;
 import fr.cvlaminck.hwweather.client.requests.HwWeatherRequest;
+import fr.cvlaminck.hwweather.client.schema.HwWeatherAvroSchemaStore;
 
 public class SearchCityRequest
         extends HwWeatherRequest<SearchCityResponse> {
 
     private String city;
 
-    public SearchCityRequest(Uri baseUri, ObjectMapper mapper) {
-        super(baseUri, mapper, SearchCityResponse.class);
+    public SearchCityRequest(Uri baseUri, HwWeatherAvroSchemaStore schemaStore) {
+        super(baseUri, schemaStore, SearchCityResponse.class);
     }
 
     public void setCity(String city) {

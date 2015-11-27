@@ -8,6 +8,7 @@ allprojects {
         jacksonVersion = '2.6.2'
         avroVersion = '1.7.7'
         commonsIoVersion = '2.4'
+        commonsCodecVersion = '1.10'
 
         jUnitVersion = '4.10'
         mockitoVersion = '1.9.0'

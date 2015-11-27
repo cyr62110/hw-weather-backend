@@ -2,6 +2,7 @@ package fr.cvlaminck.hwweather.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.cvlaminck.builders.uri.Uri;
+import fr.cvlaminck.hwweather.client.schema.HwWeatherAvroSchemaStore;
 
 import java.util.concurrent.ExecutorService;
 
@@ -10,6 +11,8 @@ public class HwWeatherClient {
     private Uri baseUri;
     private ObjectMapper objectMapper;
     private ExecutorService executorService;
+
+    private HwWeatherAvroSchemaStore schemaStore;
 
     private HwWeatherCityRequests cityRequests = new HwWeatherCityRequests(this);
     private HwWeatherWeatherRequests weatherRequests = new HwWeatherWeatherRequests(this);
@@ -44,5 +47,13 @@ public class HwWeatherClient {
 
     /* package */ void setExecutorService(ExecutorService executorService) {
         this.executorService = executorService;
+    }
+
+    /* package */ HwWeatherAvroSchemaStore getSchemaStore() {
+        return schemaStore;
+    }
+
+    /* package */ void setSchemaStore(HwWeatherAvroSchemaStore schemaStore) {
+        this.schemaStore = schemaStore;
     }
 }

@@ -18,14 +18,14 @@ public class HwWeatherWeatherRequests {
     }
 
     public WeatherResponse get(ExternalCityIdResource externalCityId, Collection<WeatherDataType> types) throws IOException, HwWeatherRequestException {
-        GetWeatherRequest request = new GetWeatherRequest(client.getBaseUri(), client.getObjectMapper());
+        GetWeatherRequest request = new GetWeatherRequest(client.getBaseUri(), client.getSchemaStore());
         request.setCity(externalCityId);
         request.setTypes(types);
         return request.call();
     }
 
     public WeatherResponse get(String cityId, Collection<WeatherDataType> types) throws IOException, HwWeatherRequestException {
-        GetWeatherRequest request = new GetWeatherRequest(client.getBaseUri(), client.getObjectMapper());
+        GetWeatherRequest request = new GetWeatherRequest(client.getBaseUri(), client.getSchemaStore());
         request.setCity(cityId);
         request.setTypes(types);
         return request.call();

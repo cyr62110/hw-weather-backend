@@ -1,5 +1,6 @@
 package fr.cvlaminck.hwweather.front.messageconverters;
 
+import fr.cvlaminck.hwweather.client.utils.HwWeatherAvroSchemaHelper;
 import fr.cvlaminck.hwweather.client.utils.HwWeatherHttpHeaders;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import fr.cvlaminck.hwweather.front.utils.AvroMimeTypes;
@@ -111,10 +112,9 @@ public class AvroHttpMessageConverter
         }
 
         try {
-            String sClientSchemaHash = clientSchemaHeaderValues.get(0);
-            int serverSchemaHash = schema.hashCode(); // FIXME: hashCode is not stable across regeneration of avro, use MD5 of json schema?
-            int clientSchemaHash = Integer.parseInt(sClientSchemaHash);
-            return serverSchemaHash != clientSchemaHash;
+            String clientSchemaHash = clientSchemaHeaderValues.get(0);
+            String serverSchemaHash = HwWeatherAvroSchemaHelper.getHash(schema);
+            return !serverSchemaHash.equals(clientSchemaHash);
         } catch (NumberFormatException ex) {
             // If the header is malformed, we react as if it was not send
             return true;
@@ -122,16 +122,8 @@ public class AvroHttpMessageConverter
     }
 
     private void writeAvroSchemaInResponse(Schema schema, HttpHeaders headers) throws IOException {
-        //FIXME: Just try gzip encoding + base 64
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        GZIPOutputStream gos = new GZIPOutputStream(bos);
-        IOUtils.write(schema.toString(false), gos);
-        gos.close();
-        String base64GzipSchema = Base64Utils.encodeToString(bos.toByteArray());
-
-        log.info("shema: " + schema.hashCode());
-        log.info(String.format("Base64+Gzip: %d, String: %d", base64GzipSchema.length(), schema.toString().length()));
-        headers.set(HwWeatherHttpHeaders.AVRO_SCHEMA, base64GzipSchema);
+        String encodedSchema = HwWeatherAvroSchemaHelper.encodeSchema(schema);
+        headers.set(HwWeatherHttpHeaders.AVRO_SCHEMA, encodedSchema);
     }
 
     private Encoder getEncoder(Schema schema, MediaType contentType, OutputStream outputStream) throws IOException {
