@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -43,7 +44,7 @@ public class DarkSkyWeatherForecastUpdater {
     private ExternalWeatherData convertResponseToResource(DarkSkyForecastResponse response) {
         ExternalWeatherData data = new ExternalWeatherData();
         data.setCurrent(convertCurrentlyToResource(response.getCurrently()));
-        data.setDaily(convertDailyToResources(response.getDaily()));
+        data.setDaily(convertDailyToResources(response, response.getDaily()));
         data.setHourly(convertHourlyToResources(response.getHourly()));
         return data;
     }
@@ -57,12 +58,14 @@ public class DarkSkyWeatherForecastUpdater {
         return current;
     }
 
-    private Collection<ExternalDailyForecastResource> convertDailyToResources(DarkSkyDailyData dailyData) {
+    private Collection<ExternalDailyForecastResource> convertDailyToResources(DarkSkyForecastResponse response, DarkSkyDailyData dailyData) {
+        // /!\ The date for daily data is given at midnight in the city timezone.
+
         List<ExternalDailyForecastResource> resources = new ArrayList<>();
         for (DarkSkyDailyData.Data data : dailyData.getData()) {
             ExternalDailyForecastResource resource = new ExternalDailyForecastResource();
             resource.setProviderName(dataProvider.getProviderName());
-            resource.setDay(getNormalizedDate(data));
+            resource.setDay(getNormalizedDate(response, data));
             resource.setMinTemperature(getNormalizedTemperature(data.getTemperatureMin()));
             resource.setMaxTemperature(getNormalizedTemperature(data.getTemperatureMax()));
             resource.setWeatherCondition(getNormalizedWeatherCondition(data));
@@ -88,8 +91,9 @@ public class DarkSkyWeatherForecastUpdater {
         return TemperatureUnit.FAHRENHEIT.convertToCelsius(temperature);
     }
 
-    private LocalDate getNormalizedDate(DarkSkyData data) {
+    private LocalDate getNormalizedDate(DarkSkyForecastResponse response, DarkSkyData data) {
         Instant instant = Instant.ofEpochMilli(data.getTime() * 1000l);
+        instant = instant.plus(response.getOffset(), ChronoUnit.HOURS);
         return instant.atZone(ZoneId.of("UTC")).toLocalDate();
     }
 
