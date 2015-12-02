@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.core.managers;
 
 import fr.cvlaminck.hwweather.core.exceptions.DataProviderException;
 import fr.cvlaminck.hwweather.core.exceptions.NoProviderWithNameException;
-import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
+import fr.cvlaminck.hwweather.core.external.model.location.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

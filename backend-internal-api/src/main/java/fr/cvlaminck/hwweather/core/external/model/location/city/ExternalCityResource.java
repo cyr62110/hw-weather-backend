@@ -1,4 +1,4 @@
-package fr.cvlaminck.hwweather.core.external.model.city;
+package fr.cvlaminck.hwweather.core.external.model.location.city;
 
 public class ExternalCityResource {
 
@@ -9,6 +9,12 @@ public class ExternalCityResource {
     private String name;
 
     private String country;
+
+    /**
+     * ISO 3166-1 code identifying the country.
+     * Can be alpha-2 or alpha-3
+     */
+    private String isoCountryCode;
 
     private Double latitude;
 
@@ -44,6 +50,14 @@ public class ExternalCityResource {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public String getIsoCountryCode() {
+        return isoCountryCode;
+    }
+
+    public void setIsoCountryCode(String isoCountryCode) {
+        this.isoCountryCode = isoCountryCode;
     }
 
     public Double getLatitude() {

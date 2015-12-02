@@ -26,8 +26,10 @@ dependencies {
 
     compile project(':backend-internal-api')
     compile project(':backend-client-api')
-    compile project(':city-provider-nominatim')
-    compile project(':weather-provider-dark-sky')
+
+    compile project(':providers/city/provider-nominatim')
+
+    compile project(':providers/weather/provider-dark-sky')
 
     testCompile "junit:junit:$jUnitVersion"
     testCompile "org.mockito:mockito-all:$mockitoVersion"

@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.front.converters;
 
 import fr.cvlaminck.hwweather.client.protocol.CityResource;
 import fr.cvlaminck.hwweather.client.protocol.ExternalCityIdResource;
-import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
+import fr.cvlaminck.hwweather.core.external.model.location.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
 import org.springframework.stereotype.Component;
 

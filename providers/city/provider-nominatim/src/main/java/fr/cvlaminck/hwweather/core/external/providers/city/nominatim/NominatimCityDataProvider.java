@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.core.external.providers.city.nominatim;
 
 import fr.cvlaminck.hwweather.core.external.annotations.DataProvider;
 import fr.cvlaminck.hwweather.core.external.exceptions.DataProviderException;
-import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
+import fr.cvlaminck.hwweather.core.external.model.location.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.external.providers.city.CityDataProvider;
 import fr.cvlaminck.nominatim.Nominatim;
 import fr.cvlaminck.nominatim.exceptions.NominatimAPIException;

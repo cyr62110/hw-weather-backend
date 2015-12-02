@@ -4,7 +4,7 @@ include 'backend-internal-api'
 
 include 'backend-deploy-openshift'
 
-include 'weather-provider-dark-sky'
+include 'providers/weather/provider-dark-sky'
 
-include 'city-provider-nominatim'
+include 'providers/city/provider-nominatim'
 

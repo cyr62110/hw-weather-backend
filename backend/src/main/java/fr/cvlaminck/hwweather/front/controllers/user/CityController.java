@@ -2,7 +2,7 @@ package fr.cvlaminck.hwweather.front.controllers.user;
 
 import fr.cvlaminck.hwweather.client.protocol.PageInformation;
 import fr.cvlaminck.hwweather.client.protocol.SearchCityResponse;
-import fr.cvlaminck.hwweather.core.external.model.city.ExternalCityResource;
+import fr.cvlaminck.hwweather.core.external.model.location.city.ExternalCityResource;
 import fr.cvlaminck.hwweather.core.managers.CityDataProviderManager;
 import fr.cvlaminck.hwweather.core.managers.CityManager;
 import fr.cvlaminck.hwweather.data.model.city.CityEntity;
